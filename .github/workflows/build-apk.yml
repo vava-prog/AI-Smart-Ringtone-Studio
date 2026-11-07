@@ -14,33 +14,33 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      # Nâng cấp lên v5 để sửa cảnh báo lỗi thời trong hình của bạn
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Nâng cấp lên v4 để tương thích hoàn toàn với môi trường mới
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
 
-      # Sửa lỗi: Cấp quyền thực thi cho file gradlew trước khi chạy build
+      # Cấp quyền thực thi cho script wrapper
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Sửa lỗi: Chạy lệnh build bằng ./gradlew chuẩn Linux
+      # Tiến hành build ứng dụng
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      # Kiểm tra và tải file APK lên (Đường dẫn mặc định của các dự án Android)
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Smart-Ringtone-Studio-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          
