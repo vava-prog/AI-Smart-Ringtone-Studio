@@ -17,7 +17,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
 
       - name: Setup Android SDK
@@ -28,12 +28,19 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Build APK
-        run: gradle assembleDebug
+      # Sửa lỗi: Cấp quyền thực thi cho file gradlew trước khi chạy build
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
+      # Sửa lỗi: Chạy lệnh build bằng ./gradlew chuẩn Linux
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      # Kiểm tra và tải file APK lên (Đường dẫn mặc định của các dự án Android)
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Smart-Ringtone-Studio-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          
