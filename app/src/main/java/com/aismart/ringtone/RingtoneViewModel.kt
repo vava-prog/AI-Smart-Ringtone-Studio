@@ -187,7 +187,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         onSettingsChanged()
     }
 
-    fun setTarget(newTarget: RingtoneTarget) {
+    fun selectTarget(newTarget: RingtoneTarget) {
         target = newTarget
     }
 

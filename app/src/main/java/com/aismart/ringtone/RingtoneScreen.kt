@@ -337,7 +337,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
                         RingtoneTarget.values().forEach { option ->
                             FilterChip(
                                 selected = vm.target == option,
-                                onClick = { vm.setTarget(option) },
+                                onClick = { vm.selectTarget(option) },
                                 label = { Text(stringResource(option.labelRes)) }
                             )
                         }
