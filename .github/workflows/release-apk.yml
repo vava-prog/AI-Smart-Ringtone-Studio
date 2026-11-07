@@ -1,0 +1,69 @@
+name: Build signed release APK
+
+# Chạy thủ công: Actions > Build signed release APK > Run workflow.
+# Cần 4 secrets trong Settings > Secrets and variables > Actions:
+#   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+# Cách tạo khóa xem mục "Phát hành bản ký số" trong README.md.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Thiếu secret KEYSTORE_BASE64. Xem README.md, mục Phát hành bản ký số."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - name: Build release APK
+        env:
+          KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          set -o pipefail
+          gradle assembleRelease --stacktrace 2>&1 | tee build.log
+
+      - name: Report build errors
+        if: failure()
+        run: |
+          errs=$(grep -E '^e: |^ERROR|error:|^> |Execution failed' build.log | head -n 10 || true)
+          printf '%s\n' "$errs" \
+            | sed -e 's#file:///home/runner/work/[^/]*/[^/]*/##' -e 's/%/%25/g' \
+            | while IFS= read -r line; do
+                [ -n "$line" ] && echo "::error::${line}"
+              done
+          true
+
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Smart-Ringtone-Studio-release-apk
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error

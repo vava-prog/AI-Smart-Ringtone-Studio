@@ -14,14 +14,71 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # Nâng cấp lên v5 để sửa cảnh báo lỗi thời trong hình của bạn
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Nâng cấp lên v4 để tương thích hoàn toàn với môi trường mới
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
+      # Repo không có gradlew, nên dùng Gradle 8.13 do setup-gradle cài sẵn
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Build APK
+        run: |
+          set -o pipefail
+          gradle assembleDebug --stacktrace 2>&1 | tee build.log
+
+      # Khi build lỗi: đưa các dòng lỗi lên mục Annotations của run
+      # để đọc được ngay trên trang Actions mà không cần mở log.
+      - name: Report build errors
+        if: failure()
+        run: |
+          errs=$(grep -E '^e: ' build.log | head -n 10 || true)
+          if [ -z "$errs" ]; then
+            errs=$(grep -E '^ERROR|error:|^> |Execution failed|^\* What went wrong' build.log | head -n 10 || true)
+          fi
+          printf '%s\n' "$errs" \
+            | sed -e 's#file:///home/runner/work/[^/]*/[^/]*/##' -e 's/%/%25/g' \
+            | while IFS= read -r line; do
+                [ -n "$line" ] && echo "::error::${line}"
+              done
+          true
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          if-no-files-found: ignore
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Smart-Ringtone-Studio-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+  # Job riêng để lỗi unit test không chặn việc tạo APK
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
@@ -30,13 +87,21 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      # Repo không có gradlew, nên dùng Gradle 8.13 do setup-gradle cài sẵn
-      - name: Build APK
-        run: gradle assembleDebug --stacktrace
+      - name: Run unit tests
+        run: |
+          set -o pipefail
+          gradle testDebugUnitTest --stacktrace 2>&1 | tee test.log
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Smart-Ringtone-Studio-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+      - name: Report test errors
+        if: failure()
+        run: |
+          errs=$(grep -E '^e: |FAILED|AssertionError|expected:' test.log | head -n 10 || true)
+          if [ -z "$errs" ]; then
+            errs=$(grep -E '^ERROR|error:|^> |Execution failed' test.log | head -n 10 || true)
+          fi
+          printf '%s\n' "$errs" \
+            | sed -e 's#file:///home/runner/work/[^/]*/[^/]*/##' -e 's/%/%25/g' \
+            | while IFS= read -r line; do
+                [ -n "$line" ] && echo "::error::${line}"
+              done
+          true

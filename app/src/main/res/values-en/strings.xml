@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Smart Ringtone Studio</string>
+    <string name="title_home">Make ringtones on your phone</string>
+    <string name="subtitle">Pick a song, trim the best part, add a fade and set it as your ringtone. Everything is processed on your device.</string>
+
+    <string name="section_source">1. Source file</string>
+    <string name="btn_pick">Choose music or video</string>
+    <string name="no_file">No file selected</string>
+    <string name="duration_fmt">Duration: %1$s</string>
+
+    <string name="section_range">2. Choose the part to cut</string>
+    <string name="analyzing_wave">Analyzing waveform…</string>
+    <string name="btn_smart_pick">Suggest best part</string>
+    <string name="label_start">Start</string>
+    <string name="label_end">End</string>
+    <string name="clip_length_fmt">Clip length: %1$s</string>
+    <string name="btn_preview_range">▶ Preview clip</string>
+    <string name="btn_preview_result">▶ Preview result</string>
+    <string name="btn_stop">■ Stop</string>
+
+    <string name="section_options">3. Audio options</string>
+    <string name="label_quality">Quality (bitrate, kbps)</string>
+    <string name="fade_in_label">Fade in: %1$s s</string>
+    <string name="fade_out_label">Fade out: %1$s s</string>
+    <string name="volume_label">Volume: %1$d%%</string>
+    <string name="est_size_fmt">Estimated size: %1$s</string>
+
+    <string name="section_export">4. Export</string>
+    <string name="btn_export">Trim and export M4A</string>
+    <string name="exporting_pct">Processing… %1$d%%</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <string name="section_result">5. Result and use</string>
+    <string name="result_name_fmt">File name: %1$s</string>
+    <string name="result_size_fmt">Size: %1$s</string>
+    <string name="label_use_as">Use as</string>
+    <string name="target_ringtone">Ringtone</string>
+    <string name="target_notification">Notification</string>
+    <string name="target_alarm">Alarm</string>
+    <string name="btn_save">Save to device</string>
+    <string name="btn_set_default">Save and set as default</string>
+    <string name="btn_share">Share file</string>
+    <string name="share_chooser">Share ringtone</string>
+
+    <string name="section_sources">Royalty-free music sources</string>
+    <string name="sources_note">Always check the license of each track before using it. Download the file, then pick it again in this app.</string>
+    <string name="source_pixabay">Pixabay Music</string>
+    <string name="source_jamendo">Jamendo</string>
+    <string name="source_fma">Free Music Archive</string>
+
+    <string name="tip_text">Tip: ringtones work best at 20-40 seconds. If your phone (for example a Xiaomi) does not pick it up automatically, go to Settings &gt; Sound &gt; Ringtone and choose the file in the Ringtones folder. Menu names may differ by device.</string>
+
+    <string name="msg_start_hint">Choose a music file to get started.</string>
+    <string name="msg_loading">Reading file…</string>
+    <string name="msg_picked">File selected. Drag the slider to choose the part to cut.</string>
+    <string name="msg_no_duration">Could not read the duration of this file. Try another file.</string>
+    <string name="msg_analysis_failed">Could not analyze the waveform, but you can still trim manually.</string>
+    <string name="msg_smart_done">Picked the part with the most energy. Preview it and adjust if needed.</string>
+    <string name="msg_processing">Processing audio…</string>
+    <string name="msg_export_done">Done! M4A/AAC file: %1$s.</string>
+    <string name="msg_export_error">Could not export: %1$s</string>
+    <string name="msg_export_cancelled">Export cancelled.</string>
+    <string name="msg_saved">Saved to the %1$s folder.</string>
+    <string name="msg_set_default_done">Set as default %1$s.</string>
+    <string name="msg_need_write_settings">Allow the app to modify system settings, then come back and tap again.</string>
+    <string name="msg_perm_denied">Storage permission is needed to save ringtones on Android 9 and below.</string>
+    <string name="msg_save_failed">Could not save: %1$s</string>
+    <string name="msg_playback_error">Could not play this audio.</string>
+    <string name="msg_unknown_error">Unknown error</string>
+</resources>

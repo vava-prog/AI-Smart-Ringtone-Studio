@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Smart Ringtone Studio</string>
+    <string name="title_home">Tạo nhạc chuông trên điện thoại</string>
+    <string name="subtitle">Chọn bài hát, cắt đoạn hay nhất, thêm fade rồi đặt làm nhạc chuông. Mọi xử lý diễn ra ngay trên máy của bạn.</string>
+
+    <string name="section_source">1. File nguồn</string>
+    <string name="btn_pick">Chọn nhạc hoặc video</string>
+    <string name="no_file">Chưa chọn file</string>
+    <string name="duration_fmt">Thời lượng: %1$s</string>
+
+    <string name="section_range">2. Chọn đoạn cần cắt</string>
+    <string name="analyzing_wave">Đang phân tích sóng âm…</string>
+    <string name="btn_smart_pick">Gợi ý đoạn hay nhất</string>
+    <string name="label_start">Bắt đầu</string>
+    <string name="label_end">Kết thúc</string>
+    <string name="clip_length_fmt">Độ dài đoạn: %1$s</string>
+    <string name="btn_preview_range">▶ Nghe thử đoạn</string>
+    <string name="btn_preview_result">▶ Nghe thử kết quả</string>
+    <string name="btn_stop">■ Dừng</string>
+
+    <string name="section_options">3. Tùy chọn âm thanh</string>
+    <string name="label_quality">Chất lượng (bitrate, kbps)</string>
+    <string name="fade_in_label">Fade in: %1$s giây</string>
+    <string name="fade_out_label">Fade out: %1$s giây</string>
+    <string name="volume_label">Âm lượng: %1$d%%</string>
+    <string name="est_size_fmt">Dung lượng ước tính: %1$s</string>
+
+    <string name="section_export">4. Xuất file</string>
+    <string name="btn_export">Cắt và xuất M4A</string>
+    <string name="exporting_pct">Đang xử lý… %1$d%%</string>
+    <string name="btn_cancel">Hủy</string>
+
+    <string name="section_result">5. Kết quả và sử dụng</string>
+    <string name="result_name_fmt">Tên file: %1$s</string>
+    <string name="result_size_fmt">Dung lượng: %1$s</string>
+    <string name="label_use_as">Dùng làm</string>
+    <string name="target_ringtone">Nhạc chuông</string>
+    <string name="target_notification">Thông báo</string>
+    <string name="target_alarm">Báo thức</string>
+    <string name="btn_save">Lưu vào máy</string>
+    <string name="btn_set_default">Lưu và đặt làm mặc định</string>
+    <string name="btn_share">Chia sẻ file</string>
+    <string name="share_chooser">Chia sẻ nhạc chuông</string>
+
+    <string name="section_sources">Nguồn nhạc miễn phí bản quyền</string>
+    <string name="sources_note">Luôn kiểm tra giấy phép của từng bài trước khi dùng. Tải file về rồi chọn lại trong ứng dụng.</string>
+    <string name="source_pixabay">Pixabay Music</string>
+    <string name="source_jamendo">Jamendo</string>
+    <string name="source_fma">Free Music Archive</string>
+
+    <string name="tip_text">Mẹo: nhạc chuông nên dài 20–40 giây. Nếu máy (ví dụ Xiaomi) không tự nhận, hãy vào Cài đặt &gt; Âm thanh &gt; Nhạc chuông rồi chọn file trong thư mục Ringtones. Tên mục có thể khác tùy máy.</string>
+
+    <string name="msg_start_hint">Chọn file nhạc để bắt đầu.</string>
+    <string name="msg_loading">Đang đọc file…</string>
+    <string name="msg_picked">Đã chọn file. Kéo thanh để chọn đoạn cần cắt.</string>
+    <string name="msg_no_duration">Không đọc được thời lượng của file này. Hãy thử file khác.</string>
+    <string name="msg_analysis_failed">Không phân tích được sóng âm, nhưng bạn vẫn có thể cắt thủ công.</string>
+    <string name="msg_smart_done">Đã chọn đoạn có nhiều năng lượng nhất. Hãy nghe thử và chỉnh lại nếu cần.</string>
+    <string name="msg_processing">Đang xử lý âm thanh…</string>
+    <string name="msg_export_done">Hoàn tất! File M4A/AAC: %1$s.</string>
+    <string name="msg_export_error">Không thể xuất file: %1$s</string>
+    <string name="msg_export_cancelled">Đã hủy xuất file.</string>
+    <string name="msg_saved">Đã lưu vào thư mục %1$s.</string>
+    <string name="msg_set_default_done">Đã đặt làm %1$s mặc định.</string>
+    <string name="msg_need_write_settings">Hãy bật quyền sửa đổi cài đặt hệ thống cho ứng dụng, rồi quay lại bấm lần nữa.</string>
+    <string name="msg_perm_denied">Cần quyền ghi bộ nhớ để lưu nhạc chuông trên Android 9 trở xuống.</string>
+    <string name="msg_save_failed">Không lưu được: %1$s</string>
+    <string name="msg_playback_error">Không phát được âm thanh này.</string>
+    <string name="msg_unknown_error">Lỗi không xác định</string>
+</resources>

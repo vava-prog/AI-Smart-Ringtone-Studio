@@ -1,45 +1,69 @@
-# AI Smart Ringtone Studio — Android MVP
+# AI Smart Ringtone Studio — Android
 
-## Trạng thái
-Đây là bộ mã nguồn MVP khởi đầu, chưa phải bản phát hành hoàn chỉnh.
+Ứng dụng tạo nhạc chuông ngay trên điện thoại: chọn bài hát, cắt đoạn hay nhất, thêm fade, rồi đặt làm nhạc chuông / thông báo / báo thức. Mọi xử lý diễn ra cục bộ trên thiết bị.
 
-### Đã có trong MVP
-- Chọn tệp âm thanh từ thiết bị bằng Android Storage Access Framework.
-- Nhập thời điểm bắt đầu/kết thúc.
-- Cắt đoạn và xuất AAC trong container M4A bằng AndroidX Media3 Transformer.
-- Lưu tệp tạm và chia sẻ kết quả.
-- Xử lý cục bộ trên thiết bị.
+## Tính năng hiện có (v0.2.0)
+- Chọn file âm thanh hoặc video bằng Storage Access Framework; nhận file được chia sẻ hoặc mở từ app khác.
+- Hiển thị sóng âm và **gợi ý đoạn hay nhất** (cửa sổ có năng lượng lớn nhất, tính trên máy, không cần Internet).
+- Chọn đoạn bằng thanh trượt hai đầu, **nghe thử** đoạn đã chọn và kết quả sau khi xuất.
+- Fade in, fade out, chỉnh âm lượng, chọn bitrate AAC (64–192 kbps), ước tính dung lượng.
+- Xuất AAC trong container M4A bằng AndroidX Media3 Transformer, có thanh tiến trình và nút Hủy.
+- **Lưu vào thư mục Ringtones / Notifications / Alarms** và **đặt làm mặc định** của hệ thống.
+- Chia sẻ file kết quả; liên kết tới các nguồn nhạc miễn phí bản quyền (Pixabay, Jamendo, Free Music Archive).
+- Giao diện tiếng Việt và tiếng Anh, giao diện sáng/tối, Material You trên Android 12+.
+- Giữ trạng thái khi xoay màn hình (ViewModel), tự dọn file tạm.
 
-### Chưa có
-- Tìm kiếm/tải nhạc Internet.
-- Kiểm tra giấy phép nguồn nhạc.
-- AI tự động chọn đoạn nhạc.
-- MP3 encoder / Opus encoder.
+## Chưa có
+- Tìm kiếm/tải nhạc ngay trong app (hiện chỉ có liên kết tới trang nguồn).
+- AI nhận diện điệp khúc bằng mô hình học máy (hiện dùng năng lượng âm thanh).
+- MP3 / Opus encoder.
 - So sánh ABX và đánh giá chất lượng nghe.
-- Đặt trực tiếp làm nhạc chuông hệ thống.
 - Kiểm thử trên thiết bị Xiaomi thực tế.
 
 ## Công nghệ
-- Kotlin
-- Jetpack Compose
-- AndroidX Media3 Transformer 1.10.0
-- Android SDK 36
-- JDK 17
-- Android Gradle Plugin 8.13.2 / Gradle 8.13
+- Kotlin 2.2, Jetpack Compose (Material 3)
+- AndroidX Media3 (ExoPlayer, Transformer) 1.10.0
+- Android SDK 36, minSdk 26, JDK 17
+- Android Gradle Plugin 8.13.2, Gradle 8.13
 
-## Build bằng GitHub Actions từ điện thoại
-1. Tạo repository GitHub mới.
-2. Tải và giải nén ZIP này.
-3. Đưa toàn bộ nội dung thư mục vào repository (Upload files).
-4. Mở tab Actions.
-5. Chạy workflow `Build Android APK` bằng `Run workflow`, hoặc push lên nhánh `main`.
-6. Khi workflow hoàn tất, mở run mới nhất.
-7. Trong mục Artifacts, tải `Smart-Ringtone-Studio-debug-apk`.
-8. Giải nén và cài `app-debug.apk` trên Android.
+## Build bằng GitHub Actions
+1. Vào tab **Actions** của repo.
+2. Chọn **Build Android APK** và bấm **Run workflow** (hoặc push lên nhánh `main`).
+3. Khi chạy xong, mở run mới nhất và tải `Smart-Ringtone-Studio-debug-apk` ở mục **Artifacts**.
+4. Giải nén và cài `app-debug.apk` trên Android (cần cho phép cài từ nguồn không xác định).
+
+Nếu build lỗi, các dòng lỗi chính được đưa lên mục **Annotations** ở đầu trang run, và toàn bộ log nằm trong artifact `build-log`. Workflow cũng chạy unit test ở một job riêng, nên test lỗi không chặn việc tạo APK.
 
 ## Build cục bộ
 Cần JDK 17, Android SDK 36 và Gradle 8.13:
-`gradle assembleDebug`
+
+```
+gradle assembleDebug
+gradle testDebugUnitTest
+```
+
+## Phát hành bản ký số
+Bản debug chỉ để thử nghiệm. Để tạo APK release đã ký:
+
+1. Tạo khóa ký (làm một lần, giữ file này cẩn thận, mất khóa thì không cập nhật được app):
+   ```
+   keytool -genkeypair -v -keystore release.jks -alias ringtone \
+     -keyalg RSA -keysize 2048 -validity 10000
+   ```
+2. Mã hóa khóa: `base64 -w0 release.jks` (trên macOS: `base64 -i release.jks`).
+3. Vào **Settings > Secrets and variables > Actions** của repo, tạo 4 secret:
+   - `KEYSTORE_BASE64`: chuỗi vừa mã hóa
+   - `KEYSTORE_PASSWORD`: mật khẩu keystore
+   - `KEY_ALIAS`: `ringtone` (hoặc tên bạn đặt)
+   - `KEY_PASSWORD`: mật khẩu khóa
+4. Chạy workflow **Build signed release APK**, rồi tải `Smart-Ringtone-Studio-release-apk` ở mục Artifacts.
+
+Không bao giờ commit file `.jks` lên repo (`.gitignore` đã chặn sẵn).
+
+## Đặt làm nhạc chuông
+Lần đầu bấm **Lưu và đặt làm mặc định**, Android sẽ mở màn hình "Sửa đổi cài đặt hệ thống" để bạn cấp quyền cho app. Sau khi bật, quay lại app và bấm lại. Trên một số máy (ví dụ Xiaomi), nếu nhạc chuông không tự nhận, hãy vào Cài đặt > Âm thanh > Nhạc chuông rồi chọn file trong thư mục Ringtones.
 
 ## Ghi chú kỹ thuật
-Media3 Transformer dựa trên các codec mà Android MediaCodec hỗ trợ. Khả năng đọc/ghi phụ thuộc thiết bị và định dạng nguồn. APK debug không phải bản phát hành ký số để phân phối rộng rãi.
+- Media3 Transformer dựa trên các codec mà Android MediaCodec hỗ trợ, nên khả năng đọc/ghi phụ thuộc thiết bị và định dạng nguồn.
+- Phân tích sóng âm chỉ xét tối đa 15 phút đầu của file.
+- Chỉ dùng nhạc bạn có quyền sử dụng; hãy kiểm tra giấy phép của từng bài.
