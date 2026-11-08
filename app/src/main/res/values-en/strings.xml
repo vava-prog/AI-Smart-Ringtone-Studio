@@ -27,7 +27,7 @@
     <string name="est_size_fmt">Estimated size: %1$s</string>
 
     <string name="section_export">4. Export</string>
-    <string name="btn_export">Trim and export M4A</string>
+    <string name="btn_export">Trim and export file</string>
     <string name="exporting_pct">Processing… %1$d%%</string>
     <string name="btn_cancel">Cancel</string>
 
@@ -58,7 +58,7 @@
     <string name="msg_analysis_failed">Could not analyze the waveform, but you can still trim manually.</string>
     <string name="msg_smart_done">Picked the part with the most energy. Preview it and adjust if needed.</string>
     <string name="msg_processing">Processing audio…</string>
-    <string name="msg_export_done">Done! M4A/AAC file: %1$s.</string>
+    <string name="msg_export_done">Done! %1$s file, size %2$s.</string>
     <string name="msg_export_error">Could not export: %1$s</string>
     <string name="msg_export_cancelled">Export cancelled.</string>
     <string name="msg_saved">Saved to the %1$s folder.</string>
@@ -89,7 +89,7 @@
     <string name="btn_create_new">Create a new ringtone</string>
 
     <string name="history_title">Ringtone history</string>
-    <string name="history_meta_fmt">%1$s · %2$d kbps · %3$s</string>
+    <string name="history_meta_fmt">%1$s · %2$s · %3$s</string>
     <string name="btn_play">▶ Play</string>
     <string name="btn_set_as">Set as…</string>
     <string name="btn_delete">Delete</string>
@@ -118,4 +118,13 @@
     <string name="link_note">The app does not download music from YouTube or TikTok. Use a file you have the right to use (your own video, royalty-free music), then pick it in step 1. The link is saved with the ringtone as its source.</string>
     <string name="btn_source">Source</string>
     <string name="msg_link_received">Link received. Now pick an audio file you have the right to use in step 1.</string>
+
+    <string name="label_format">Output format</string>
+    <string name="format_m4a">M4A (AAC)</string>
+    <string name="format_mp3">MP3</string>
+    <string name="format_wav">WAV (uncompressed)</string>
+    <string name="format_hint_mp3">MP3 supports 8-48 kHz sample rates. If the source uses another rate, choose M4A or WAV.</string>
+    <string name="format_hint_wav">WAV is uncompressed, so files are large (about 10 MB per minute); long ringtones get heavy.</string>
+    <string name="msg_mp3_rate_unsupported">Cannot export MP3 because the source is %1$d Hz. Choose M4A or WAV.</string>
+    <string name="msg_no_audio">Could not read any audio in the selected range.</string>
 </resources>

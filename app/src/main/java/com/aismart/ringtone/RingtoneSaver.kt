@@ -24,17 +24,16 @@ enum class RingtoneTarget(
 
 /** Lưu file vào thư viện âm thanh của hệ thống và đặt làm nhạc chuông mặc định. */
 object RingtoneSaver {
-    private const val MIME_M4A = "audio/mp4"
-
     fun canWriteSettings(context: Context): Boolean = Settings.System.canWrite(context)
 
     /** Lưu vào Ringtones/Notifications/Alarms để hệ thống nhìn thấy; trả về Uri trong MediaStore. */
     fun saveToLibrary(context: Context, source: File, title: String, target: RingtoneTarget): Uri {
-        val fileName = "$title.m4a"
+        val format = OutputFormat.fromExt(source.extension)
+        val fileName = "$title.${format.ext}"
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveScoped(context, source, title, fileName, target)
+            saveScoped(context, source, title, fileName, format.mime, target)
         } else {
-            saveLegacy(context, source, title, fileName, target)
+            saveLegacy(context, source, title, fileName, format.mime, target)
         }
     }
 
@@ -54,12 +53,13 @@ object RingtoneSaver {
         source: File,
         title: String,
         fileName: String,
+        mime: String,
         target: RingtoneTarget
     ): Uri {
         val resolver = context.contentResolver
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-            put(MediaStore.MediaColumns.MIME_TYPE, MIME_M4A)
+            put(MediaStore.MediaColumns.MIME_TYPE, mime)
             put(MediaStore.MediaColumns.RELATIVE_PATH, target.mediaDir)
             put(MediaStore.Audio.Media.TITLE, title)
             put(MediaStore.MediaColumns.IS_PENDING, 1)
@@ -88,19 +88,20 @@ object RingtoneSaver {
         source: File,
         title: String,
         fileName: String,
+        mime: String,
         target: RingtoneTarget
     ): Uri {
         val dir = Environment.getExternalStoragePublicDirectory(target.mediaDir)
         if (!dir.exists() && !dir.mkdirs()) throw IOException("Cannot create ${dir.path}")
 
         var dest = File(dir, fileName)
-        if (dest.exists()) dest = File(dir, "${title}_${System.currentTimeMillis()}.m4a")
+        if (dest.exists()) dest = File(dir, "${title}_${System.currentTimeMillis()}.${source.extension}")
         source.copyTo(dest, overwrite = false)
 
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DATA, dest.absolutePath)
             put(MediaStore.MediaColumns.DISPLAY_NAME, dest.name)
-            put(MediaStore.MediaColumns.MIME_TYPE, MIME_M4A)
+            put(MediaStore.MediaColumns.MIME_TYPE, mime)
             put(MediaStore.MediaColumns.SIZE, dest.length())
             put(MediaStore.Audio.Media.TITLE, title)
         }

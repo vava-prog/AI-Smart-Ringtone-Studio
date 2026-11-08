@@ -27,6 +27,13 @@ class RingtoneMathTest {
     }
 
     @Test
+    fun estimateOutputBytes_perFormat() {
+        assertEquals(5_292_044L, RingtoneMath.estimateOutputBytes(OutputFormat.WAV, 128, 30_000))
+        assertEquals(480_000L, RingtoneMath.estimateOutputBytes(OutputFormat.MP3, 128, 30_000))
+        assertEquals(480_000L, RingtoneMath.estimateOutputBytes(OutputFormat.M4A, 128, 30_000))
+    }
+
+    @Test
     fun safeTitle_removesExtensionAndIllegalCharacters() {
         assertEquals("My_Song", RingtoneMath.safeTitle("My:Song.mp3"))
         assertEquals("a_b", RingtoneMath.safeTitle("a/b.m4a"))

@@ -48,6 +48,15 @@ object RingtoneMath {
         return bitrateKbps * 125L * max(0L, durationMs) / 1000L
     }
 
+    /** Dung lượng ước tính theo định dạng; WAV tính theo 44,1 kHz stereo 16-bit. */
+    fun estimateOutputBytes(format: OutputFormat, bitrateKbps: Int, durationMs: Long): Long {
+        return if (format.usesBitrate) {
+            estimateSizeBytes(bitrateKbps, durationMs)
+        } else {
+            max(0L, durationMs) * 176_400L / 1000L + 44L
+        }
+    }
+
     /** Tên file an toàn lấy từ tên hiển thị của file nguồn. */
     fun safeTitle(name: String?): String {
         val raw = name?.trim().orEmpty()

@@ -82,6 +82,17 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                     steps = 9
                 )
 
+                Text(stringResource(R.string.label_format))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutputFormat.values().forEach { option ->
+                        FilterChip(
+                            selected = vm.defaultFormat == option,
+                            onClick = { vm.chooseDefaultFormat(option) },
+                            label = { Text(stringResource(option.labelRes)) }
+                        )
+                    }
+                }
+
                 Text(stringResource(R.string.label_quality))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(64, 96, 128, 192).forEach { kbps ->

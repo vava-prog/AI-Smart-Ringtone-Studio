@@ -27,6 +27,7 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -72,6 +73,8 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         private set
     var defaultBitrate by mutableIntStateOf(settings.bitrateKbps)
         private set
+    var defaultFormat by mutableStateOf(OutputFormat.fromExt(settings.formatExt))
+        private set
     var themeMode by mutableIntStateOf(settings.themeMode)
         private set
 
@@ -82,6 +85,8 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     var volumePercent by mutableIntStateOf(settings.volumePercent)
         private set
     var bitrateKbps by mutableIntStateOf(settings.bitrateKbps)
+        private set
+    var format by mutableStateOf(OutputFormat.fromExt(settings.formatExt))
         private set
 
     var sourceLink by mutableStateOf("")
@@ -110,6 +115,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     // ---- Nội bộ ----
     private var analysisJob: Job? = null
     private var progressJob: Job? = null
+    private var encodeJob: Job? = null
     private var transformer: Transformer? = null
     private var pendingOutput: File? = null
     private var player: ExoPlayer? = null
@@ -155,6 +161,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         fadeOutSec = defaultFadeOut
         volumePercent = defaultVolume
         bitrateKbps = defaultBitrate
+        format = defaultFormat
         message = Msg(R.string.msg_loading)
 
         viewModelScope.launch {
@@ -230,6 +237,11 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun setBitrate(kbps: Int) {
         bitrateKbps = kbps
+        onSettingsChanged()
+    }
+
+    fun selectFormat(newFormat: OutputFormat) {
+        format = newFormat
         onSettingsChanged()
     }
 
@@ -314,17 +326,17 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         stopPlayback()
 
         val clip = clipMs
-        val bitrate = bitrateKbps
+        val fmt = format
+        val bitrate = if (fmt.usesBitrate) bitrateKbps else 0
         val link = SourceLinks.parse(sourceLink)?.url
         val clipUs = clip * 1000L
         val maxFadeUs = clipUs / 2
         val fadeInUs = min((fadeInSec * 1_000_000f).toLong(), maxFadeUs)
         val fadeOutUs = min((fadeOutSec * 1_000_000f).toLong(), maxFadeUs)
-        val processor = FadeGainAudioProcessor(clipUs, fadeInUs, fadeOutUs, volumePercent / 100f)
+        val gain = volumePercent / 100f
 
-        app.cacheDir.listFiles { f -> f.name.startsWith("ringtone_") && f.name.endsWith(".m4a") }
-            ?.forEach { it.delete() }
-        val out = File(app.cacheDir, "ringtone_${System.currentTimeMillis()}.m4a")
+        app.cacheDir.listFiles { f -> f.name.startsWith("ringtone_") }?.forEach { it.delete() }
+        val out = File(app.cacheDir, "ringtone_${System.currentTimeMillis()}.${fmt.ext}")
 
         outputFile = null
         pendingOutput = out
@@ -332,7 +344,14 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         exporting = true
         message = Msg(R.string.msg_processing)
 
+        // MP3 và WAV: tự giải mã và mã hóa; M4A: dùng Media3 Transformer
+        if (fmt != OutputFormat.M4A) {
+            exportWithEncoder(uri, fmt, out, clip, bitrate, link, fadeInUs, fadeOutUs, gain)
+            return
+        }
+
         try {
+            val processor = FadeGainAudioProcessor(clipUs, fadeInUs, fadeOutUs, gain)
             val mediaItem = MediaItem.Builder()
                 .setUri(uri)
                 .setClippingConfiguration(
@@ -350,7 +369,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
             val encoderFactory = DefaultEncoderFactory.Builder(app)
                 .setRequestedAudioEncoderSettings(
-                    AudioEncoderSettings.Builder().setBitrate(bitrateKbps * 1000).build()
+                    AudioEncoderSettings.Builder().setBitrate(bitrate * 1000).build()
                 )
                 .build()
 
@@ -365,7 +384,11 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
                         exporting = false
                         progress = 1f
                         outputFile = out
-                        message = Msg(R.string.msg_export_done, RingtoneMath.formatSize(out.length()))
+                        message = Msg(
+                            R.string.msg_export_done,
+                            app.getString(fmt.labelRes),
+                            RingtoneMath.formatSize(out.length())
+                        )
                         recordHistory(out, clip, bitrate, link)
                     }
 
@@ -415,15 +438,81 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
+    private fun exportWithEncoder(
+        uri: Uri,
+        fmt: OutputFormat,
+        out: File,
+        clip: Long,
+        bitrate: Int,
+        link: String?,
+        fadeInUs: Long,
+        fadeOutUs: Long,
+        gain: Float
+    ) {
+        val rangeStart = startMs
+        val rangeEnd = endMs
+        encodeJob?.cancel()
+        encodeJob = viewModelScope.launch {
+            try {
+                withContext(Dispatchers.Default) {
+                    PcmExporter.export(
+                        context = app,
+                        uri = uri,
+                        startMs = rangeStart,
+                        endMs = rangeEnd,
+                        format = fmt,
+                        bitrateKbps = bitrate,
+                        fadeInUs = fadeInUs,
+                        fadeOutUs = fadeOutUs,
+                        gain = gain,
+                        outFile = out,
+                        onProgress = { value -> progress = value },
+                        cancelled = { !isActive }
+                    )
+                }
+                pendingOutput = null
+                exporting = false
+                progress = 1f
+                outputFile = out
+                message = Msg(
+                    R.string.msg_export_done,
+                    app.getString(fmt.labelRes),
+                    RingtoneMath.formatSize(out.length())
+                )
+                recordHistory(out, clip, bitrate, link)
+            } catch (e: CancellationException) {
+                out.delete()
+                throw e
+            } catch (e: PcmExporter.UnsupportedSampleRateException) {
+                finishWithError(out, Msg(R.string.msg_mp3_rate_unsupported, e.sampleRate))
+            } catch (e: PcmExporter.NoAudioException) {
+                finishWithError(out, Msg(R.string.msg_no_audio))
+            } catch (e: Exception) {
+                finishWithError(
+                    out,
+                    Msg(R.string.msg_export_error, e.message ?: app.getString(R.string.msg_unknown_error))
+                )
+            }
+        }
+    }
+
+    private fun finishWithError(out: File, error: Msg) {
+        pendingOutput = null
+        exporting = false
+        out.delete()
+        message = error
+    }
+
     fun cancelExport(silent: Boolean = false) {
-        val active = transformer
-        if (!exporting || active == null) return
+        if (!exporting) return
         progressJob?.cancel()
         try {
-            active.cancel()
+            transformer?.cancel()
         } catch (_: Exception) {
         }
         transformer = null
+        encodeJob?.cancel()
+        encodeJob = null
         exporting = false
         pendingOutput?.delete()
         pendingOutput = null
@@ -474,6 +563,11 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     fun updateDefaultBitrate(value: Int) {
         defaultBitrate = value
         settings.bitrateKbps = value
+    }
+
+    fun chooseDefaultFormat(value: OutputFormat) {
+        defaultFormat = value
+        settings.formatExt = value.ext
     }
 
     fun selectThemeMode(mode: Int) {

@@ -85,3 +85,11 @@ Lần đầu bấm **Lưu và đặt làm mặc định**, Android sẽ mở mà
 
 ## Logo
 Logo kiểu liquid glass nằm ở `docs/logo.png` (1024×1024) và ảnh chia sẻ `docs/social-preview.png` (1280×640). Icon ứng dụng dùng hai lớp adaptive (`ic_launcher_bg.png`, `ic_launcher_foreground.png`) kèm lớp đơn sắc cho biểu tượng theo chủ đề của Android 13+.
+
+## Định dạng đầu ra / Output formats
+
+- **M4A (AAC)** — Media3 Transformer, chọn bitrate 64–192 kbps.
+- **MP3** — mã hóa bằng LAME (LGPL, mã nguồn trong `third_party/lame`), nguồn 8–48 kHz.
+- **WAV** — PCM 16-bit không nén (file lớn).
+
+Opus/OGG/FLAC chưa được hỗ trợ vì Android không có bộ mã hóa tích hợp sẵn cho các định dạng này.

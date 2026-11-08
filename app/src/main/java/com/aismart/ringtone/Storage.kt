@@ -16,7 +16,11 @@ data class HistoryEntry(
     val sizeBytes: Long,
     val fileName: String,
     val sourceUrl: String? = null
-)
+) {
+    /** Định dạng file, suy ra từ đuôi tên file. */
+    val format: OutputFormat
+        get() = OutputFormat.fromExt(fileName.substringAfterLast('.', "m4a"))
+}
 
 /** Lưu lịch sử dưới dạng JSON và giữ bản sao file M4A trong filesDir/ringtones. */
 class HistoryStore(context: Context) {
@@ -67,7 +71,7 @@ class HistoryStore(context: Context) {
             clipMs = clipMs,
             bitrateKbps = bitrateKbps,
             sizeBytes = source.length(),
-            fileName = "$id.m4a",
+            fileName = "$id.${source.extension.ifEmpty { "m4a" }}",
             sourceUrl = sourceUrl
         )
         source.copyTo(file(entry), overwrite = true)
@@ -114,6 +118,11 @@ class HistoryStore(context: Context) {
 /** Cài đặt mặc định và giao diện, lưu bằng SharedPreferences. */
 class SettingsStore(context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+
+    /** Đuôi file của định dạng mặc định (m4a, mp3, wav). */
+    var formatExt: String
+        get() = prefs.getString("format", "m4a") ?: "m4a"
+        set(value) = prefs.edit().putString("format", value).apply()
 
     var bitrateKbps: Int
         get() = prefs.getInt("bitrate", 128)

@@ -79,7 +79,11 @@ fun HistoryScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                         stringResource(
                             R.string.history_meta_fmt,
                             RingtoneMath.formatTime(entry.clipMs),
-                            entry.bitrateKbps,
+                            if (entry.bitrateKbps > 0) {
+                                "${entry.format.ext.uppercase()} ${entry.bitrateKbps} kbps"
+                            } else {
+                                entry.format.ext.uppercase()
+                            },
                             RingtoneMath.formatSize(entry.sizeBytes)
                         ),
                         style = MaterialTheme.typography.bodySmall
@@ -101,7 +105,7 @@ fun HistoryScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                                     vm.historyFile(entry)
                                 )
                                 val share = Intent(Intent.ACTION_SEND).apply {
-                                    type = "audio/mp4"
+                                    type = entry.format.mime
                                     putExtra(Intent.EXTRA_STREAM, uri)
                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }

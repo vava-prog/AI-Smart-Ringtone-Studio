@@ -27,7 +27,7 @@
     <string name="est_size_fmt">Dung lượng ước tính: %1$s</string>
 
     <string name="section_export">4. Xuất file</string>
-    <string name="btn_export">Cắt và xuất M4A</string>
+    <string name="btn_export">Cắt và xuất file</string>
     <string name="exporting_pct">Đang xử lý… %1$d%%</string>
     <string name="btn_cancel">Hủy</string>
 
@@ -58,7 +58,7 @@
     <string name="msg_analysis_failed">Không phân tích được sóng âm, nhưng bạn vẫn có thể cắt thủ công.</string>
     <string name="msg_smart_done">Đã chọn đoạn có nhiều năng lượng nhất. Hãy nghe thử và chỉnh lại nếu cần.</string>
     <string name="msg_processing">Đang xử lý âm thanh…</string>
-    <string name="msg_export_done">Hoàn tất! File M4A/AAC: %1$s.</string>
+    <string name="msg_export_done">Hoàn tất! File %1$s, dung lượng %2$s.</string>
     <string name="msg_export_error">Không thể xuất file: %1$s</string>
     <string name="msg_export_cancelled">Đã hủy xuất file.</string>
     <string name="msg_saved">Đã lưu vào thư mục %1$s.</string>
@@ -89,7 +89,7 @@
     <string name="btn_create_new">Tạo nhạc chuông mới</string>
 
     <string name="history_title">Lịch sử nhạc chuông</string>
-    <string name="history_meta_fmt">%1$s · %2$d kbps · %3$s</string>
+    <string name="history_meta_fmt">%1$s · %2$s · %3$s</string>
     <string name="btn_play">▶ Nghe</string>
     <string name="btn_set_as">Đặt làm…</string>
     <string name="btn_delete">Xóa</string>
@@ -118,4 +118,13 @@
     <string name="link_note">Ứng dụng không tải nhạc từ YouTube hay TikTok. Hãy dùng file bạn có quyền sử dụng (video của chính bạn, nhạc miễn phí bản quyền) rồi chọn ở bước 1. Link được lưu kèm nhạc chuông để ghi nguồn.</string>
     <string name="btn_source">Nguồn</string>
     <string name="msg_link_received">Đã nhận link. Hãy chọn file âm thanh bạn có quyền sử dụng ở bước 1.</string>
+
+    <string name="label_format">Định dạng đầu ra</string>
+    <string name="format_m4a">M4A (AAC)</string>
+    <string name="format_mp3">MP3</string>
+    <string name="format_wav">WAV (không nén)</string>
+    <string name="format_hint_mp3">MP3 hỗ trợ tần số lấy mẫu 8–48 kHz. Nếu file gốc có tần số khác, hãy dùng M4A hoặc WAV.</string>
+    <string name="format_hint_wav">WAV không nén nên file lớn (khoảng 10 MB mỗi phút), nhạc chuông dài sẽ khá nặng.</string>
+    <string name="msg_mp3_rate_unsupported">Không xuất được MP3 vì file gốc có tần số %1$d Hz. Hãy chọn M4A hoặc WAV.</string>
+    <string name="msg_no_audio">Không đọc được âm thanh trong đoạn đã chọn.</string>
 </resources>

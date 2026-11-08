@@ -231,22 +231,49 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                         enabled = !vm.exporting
                     )
 
-                    Text(stringResource(R.string.label_quality))
+                    Text(stringResource(R.string.label_format))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf(64, 96, 128, 192).forEach { kbps ->
+                        OutputFormat.values().forEach { option ->
                             FilterChip(
-                                selected = vm.bitrateKbps == kbps,
-                                onClick = { vm.setBitrate(kbps) },
+                                selected = vm.format == option,
+                                onClick = { vm.selectFormat(option) },
                                 enabled = !vm.exporting,
-                                label = { Text("$kbps") }
+                                label = { Text(stringResource(option.labelRes)) }
                             )
+                        }
+                    }
+                    when (vm.format) {
+                        OutputFormat.MP3 -> Text(
+                            stringResource(R.string.format_hint_mp3),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        OutputFormat.WAV -> Text(
+                            stringResource(R.string.format_hint_wav),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        OutputFormat.M4A -> {}
+                    }
+
+                    if (vm.format.usesBitrate) {
+                        Text(stringResource(R.string.label_quality))
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf(64, 96, 128, 192).forEach { kbps ->
+                                FilterChip(
+                                    selected = vm.bitrateKbps == kbps,
+                                    onClick = { vm.setBitrate(kbps) },
+                                    enabled = !vm.exporting,
+                                    label = { Text("$kbps") }
+                                )
+                            }
                         }
                     }
                     Text(
                         stringResource(
                             R.string.est_size_fmt,
                             RingtoneMath.formatSize(
-                                RingtoneMath.estimateSizeBytes(vm.bitrateKbps, vm.clipMs)
+                                RingtoneMath.estimateOutputBytes(vm.format, vm.bitrateKbps, vm.clipMs)
                             )
                         ),
                         style = MaterialTheme.typography.bodySmall
@@ -333,7 +360,7 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                                 file
                             )
                             val share = Intent(Intent.ACTION_SEND).apply {
-                                type = "audio/mp4"
+                                type = OutputFormat.fromExt(file.extension).mime
                                 putExtra(Intent.EXTRA_STREAM, contentUri)
                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             }
