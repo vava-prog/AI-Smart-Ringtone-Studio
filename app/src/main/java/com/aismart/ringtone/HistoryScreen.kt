@@ -2,6 +2,7 @@ package com.aismart.ringtone
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -110,6 +111,14 @@ fun HistoryScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                             } catch (_: ActivityNotFoundException) {
                             }
                         }) { Text(stringResource(R.string.btn_share)) }
+                        entry.sourceUrl?.let { url ->
+                            TextButton(onClick = {
+                                try {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                } catch (_: ActivityNotFoundException) {
+                                }
+                            }) { Text(stringResource(R.string.btn_source)) }
+                        }
                         TextButton(onClick = { deleteEntry = entry }) {
                             Text(stringResource(R.string.btn_delete))
                         }

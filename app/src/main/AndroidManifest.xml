@@ -45,6 +45,13 @@
                 <data android:mimeType="audio/*" />
             </intent-filter>
 
+            <!-- Nhận link YouTube / TikTok khi bấm Chia sẻ từ hai ứng dụng đó -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
             <!-- Mở file âm thanh từ trình quản lý file -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

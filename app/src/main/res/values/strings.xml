@@ -107,4 +107,15 @@
     <string name="settings_about">Giới thiệu</string>
     <string name="about_version_fmt">Phiên bản %1$s</string>
     <string name="about_text">Mọi xử lý diễn ra hoàn toàn trên máy, ứng dụng không tải dữ liệu nào lên Internet.</string>
+
+    <string name="section_link">Link YouTube / TikTok (tùy chọn)</string>
+    <string name="label_link">Dán link video</string>
+    <string name="link_invalid">Chỉ hỗ trợ link YouTube hoặc TikTok.</string>
+    <string name="link_detected_fmt">Đã nhận dạng: %1$s</string>
+    <string name="open_in_fmt">Mở trong %1$s</string>
+    <string name="platform_youtube">YouTube</string>
+    <string name="platform_tiktok">TikTok</string>
+    <string name="link_note">Ứng dụng không tải nhạc từ YouTube hay TikTok. Hãy dùng file bạn có quyền sử dụng (video của chính bạn, nhạc miễn phí bản quyền) rồi chọn ở bước 1. Link được lưu kèm nhạc chuông để ghi nguồn.</string>
+    <string name="btn_source">Nguồn</string>
+    <string name="msg_link_received">Đã nhận link. Hãy chọn file âm thanh bạn có quyền sử dụng ở bước 1.</string>
 </resources>

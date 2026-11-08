@@ -10,6 +10,7 @@
 Ứng dụng có thanh điều hướng 4 tab theo bố cục của các mẫu Vue Admin Dashboard, viết lại hoàn toàn bằng Jetpack Compose với phong cách liquid glass:
 - **Tổng quan:** thẻ số liệu (số nhạc chuông, tổng thời lượng, dung lượng, độ dài trung bình), biểu đồ cột 7 ngày, phân bố theo chất lượng và hoạt động gần đây.
 - **Tạo mới:** màn hình cắt nhạc, nghe thử, fade, xuất và đặt làm nhạc chuông.
+  Có ô dán link YouTube/TikTok (hoặc bấm Chia sẻ từ hai app đó sang) để mở lại video và ghi nguồn vào lịch sử. Ứng dụng **không tải nhạc** từ YouTube hay TikTok; hãy dùng file bạn có quyền sử dụng.
 - **Lịch sử:** mọi nhạc chuông đã xuất được lưu lại (tối đa 200), có nghe lại, đặt làm nhạc chuông/thông báo/báo thức, chia sẻ và xóa.
 - **Cài đặt:** giá trị mặc định (bitrate, fade, âm lượng) và giao diện sáng/tối/theo hệ thống.
 

@@ -23,6 +23,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -87,6 +88,46 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
     ) {
         Text(stringResource(R.string.title_home), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(R.string.subtitle), style = MaterialTheme.typography.bodyMedium)
+
+        // Link YouTube / TikTok (tùy chọn): chỉ để mở lại video và ghi nguồn
+        GlassCard(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.section_link), style = MaterialTheme.typography.titleMedium)
+                val link = SourceLinks.parse(vm.sourceLink)
+                OutlinedTextField(
+                    value = vm.sourceLink,
+                    onValueChange = { vm.updateSourceLink(it) },
+                    label = { Text(stringResource(R.string.label_link)) },
+                    singleLine = true,
+                    isError = vm.sourceLink.isNotBlank() && link == null,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (vm.sourceLink.isNotBlank()) {
+                    if (link == null) {
+                        Text(
+                            stringResource(R.string.link_invalid),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    } else {
+                        val platformName = stringResource(
+                            if (link.platform == SourceLinks.Platform.YOUTUBE) R.string.platform_youtube
+                            else R.string.platform_tiktok
+                        )
+                        Text(stringResource(R.string.link_detected_fmt, platformName))
+                        OutlinedButton(
+                            onClick = { openUrl(link.url) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(stringResource(R.string.open_in_fmt, platformName)) }
+                    }
+                }
+                Text(
+                    stringResource(R.string.link_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
 
         // 1. File nguồn
         GlassCard(Modifier.fillMaxWidth()) {

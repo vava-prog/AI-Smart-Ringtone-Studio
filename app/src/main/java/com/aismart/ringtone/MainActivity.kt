@@ -29,10 +29,17 @@ class MainActivity : ComponentActivity() {
         viewModel.stopPlayback()
     }
 
-    /** Nhận file âm thanh được chia sẻ (SEND) hoặc mở từ trình quản lý file (VIEW). */
+    /** Nhận file âm thanh hoặc link YouTube/TikTok được chia sẻ (SEND), hoặc mở file từ trình quản lý (VIEW). */
     private fun handleIncomingIntent(incoming: Intent?) {
         val uri: Uri? = when (incoming?.action) {
-            Intent.ACTION_SEND -> readStreamExtra(incoming)
+            Intent.ACTION_SEND -> {
+                val stream = readStreamExtra(incoming)
+                if (stream == null) {
+                    val link = SourceLinks.parse(incoming.getStringExtra(Intent.EXTRA_TEXT))
+                    if (link != null) viewModel.receiveLink(link.url)
+                }
+                stream
+            }
             Intent.ACTION_VIEW -> incoming.data
             else -> null
         }

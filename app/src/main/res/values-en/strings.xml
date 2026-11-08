@@ -107,4 +107,15 @@
     <string name="settings_about">About</string>
     <string name="about_version_fmt">Version %1$s</string>
     <string name="about_text">Everything is processed on your device. The app does not upload any data to the Internet.</string>
+
+    <string name="section_link">YouTube / TikTok link (optional)</string>
+    <string name="label_link">Paste the video link</string>
+    <string name="link_invalid">Only YouTube or TikTok links are supported.</string>
+    <string name="link_detected_fmt">Recognized: %1$s</string>
+    <string name="open_in_fmt">Open in %1$s</string>
+    <string name="platform_youtube">YouTube</string>
+    <string name="platform_tiktok">TikTok</string>
+    <string name="link_note">The app does not download music from YouTube or TikTok. Use a file you have the right to use (your own video, royalty-free music), then pick it in step 1. The link is saved with the ringtone as its source.</string>
+    <string name="btn_source">Source</string>
+    <string name="msg_link_received">Link received. Now pick an audio file you have the right to use in step 1.</string>
 </resources>

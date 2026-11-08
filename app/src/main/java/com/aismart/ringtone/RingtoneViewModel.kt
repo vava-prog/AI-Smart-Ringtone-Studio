@@ -84,6 +84,11 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     var bitrateKbps by mutableIntStateOf(settings.bitrateKbps)
         private set
 
+    var sourceLink by mutableStateOf("")
+        private set
+    var openCreateTick by mutableIntStateOf(0)
+        private set
+
     var historyEntries by mutableStateOf<List<HistoryEntry>>(emptyList())
         private set
     var playingHistoryId by mutableStateOf<String?>(null)
@@ -116,6 +121,17 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             historyEntries = withContext(Dispatchers.IO) { history.load() }
         }
+    }
+
+    fun updateSourceLink(text: String) {
+        sourceLink = text
+    }
+
+    /** Nhận link YouTube/TikTok được chia sẻ từ app khác và chuyển sang tab Tạo mới. */
+    fun receiveLink(url: String) {
+        sourceLink = url
+        openCreateTick++
+        message = Msg(R.string.msg_link_received)
     }
 
     fun showMessage(@StringRes res: Int) {
@@ -299,6 +315,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
         val clip = clipMs
         val bitrate = bitrateKbps
+        val link = SourceLinks.parse(sourceLink)?.url
         val clipUs = clip * 1000L
         val maxFadeUs = clipUs / 2
         val fadeInUs = min((fadeInSec * 1_000_000f).toLong(), maxFadeUs)
@@ -349,7 +366,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
                         progress = 1f
                         outputFile = out
                         message = Msg(R.string.msg_export_done, RingtoneMath.formatSize(out.length()))
-                        recordHistory(out, clip, bitrate)
+                        recordHistory(out, clip, bitrate, link)
                     }
 
                     override fun onError(
@@ -414,11 +431,11 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     // ---- Lịch sử ----
-    private fun recordHistory(file: File, clip: Long, bitrate: Int) {
+    private fun recordHistory(file: File, clip: Long, bitrate: Int, link: String?) {
         val title = RingtoneMath.safeTitle(sourceName)
         viewModelScope.launch {
             try {
-                val entry = withContext(Dispatchers.IO) { history.addFrom(file, title, clip, bitrate) }
+                val entry = withContext(Dispatchers.IO) { history.addFrom(file, title, clip, bitrate, link) }
                 historyEntries = listOf(entry) + historyEntries
             } catch (_: Exception) {
             }

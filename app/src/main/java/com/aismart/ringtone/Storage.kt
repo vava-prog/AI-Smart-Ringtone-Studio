@@ -14,7 +14,8 @@ data class HistoryEntry(
     val clipMs: Long,
     val bitrateKbps: Int,
     val sizeBytes: Long,
-    val fileName: String
+    val fileName: String,
+    val sourceUrl: String? = null
 )
 
 /** Lưu lịch sử dưới dạng JSON và giữ bản sao file M4A trong filesDir/ringtones. */
@@ -39,7 +40,8 @@ class HistoryStore(context: Context) {
                     clipMs = o.getLong("clipMs"),
                     bitrateKbps = o.getInt("bitrateKbps"),
                     sizeBytes = o.getLong("sizeBytes"),
-                    fileName = o.getString("fileName")
+                    fileName = o.getString("fileName"),
+                    sourceUrl = o.optString("sourceUrl").takeIf { it.isNotEmpty() }
                 )
                 if (file(entry).exists()) result.add(entry)
             }
@@ -50,7 +52,13 @@ class HistoryStore(context: Context) {
     }
 
     @Synchronized
-    fun addFrom(source: File, title: String, clipMs: Long, bitrateKbps: Int): HistoryEntry {
+    fun addFrom(
+        source: File,
+        title: String,
+        clipMs: Long,
+        bitrateKbps: Int,
+        sourceUrl: String? = null
+    ): HistoryEntry {
         val id = UUID.randomUUID().toString()
         val entry = HistoryEntry(
             id = id,
@@ -59,7 +67,8 @@ class HistoryStore(context: Context) {
             clipMs = clipMs,
             bitrateKbps = bitrateKbps,
             sizeBytes = source.length(),
-            fileName = "$id.m4a"
+            fileName = "$id.m4a",
+            sourceUrl = sourceUrl
         )
         source.copyTo(file(entry), overwrite = true)
         val updated = listOf(entry) + load()
@@ -86,6 +95,7 @@ class HistoryStore(context: Context) {
                     .put("bitrateKbps", e.bitrateKbps)
                     .put("sizeBytes", e.sizeBytes)
                     .put("fileName", e.fileName)
+                    .put("sourceUrl", e.sourceUrl ?: "")
             )
         }
         val tmp = File(index.parentFile, "history.json.tmp")

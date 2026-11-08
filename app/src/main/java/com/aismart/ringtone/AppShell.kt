@@ -83,6 +83,9 @@ fun RingtoneApp(vm: RingtoneViewModel) {
     RingtoneTheme(dark) {
         var tab by rememberSaveable { mutableStateOf(TAB_DASHBOARD) }
         BackHandler(enabled = tab != TAB_DASHBOARD) { tab = TAB_DASHBOARD }
+        LaunchedEffect(vm.openCreateTick) {
+            if (vm.openCreateTick > 0) tab = TAB_CREATE
+        }
 
         // Ở các tab khác "Tạo mới", thông báo hiện dưới dạng snackbar
         val snackbar = remember { SnackbarHostState() }
