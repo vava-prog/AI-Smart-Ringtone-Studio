@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.png" alt="AI Smart Ringtone Studio" width="160">
+</p>
+
 # AI Smart Ringtone Studio — Android
 
 Ứng dụng tạo nhạc chuông ngay trên điện thoại: chọn bài hát, cắt đoạn hay nhất, thêm fade, rồi đặt làm nhạc chuông / thông báo / báo thức. Mọi xử lý diễn ra cục bộ trên thiết bị.
@@ -67,3 +71,6 @@ Lần đầu bấm **Lưu và đặt làm mặc định**, Android sẽ mở mà
 - Media3 Transformer dựa trên các codec mà Android MediaCodec hỗ trợ, nên khả năng đọc/ghi phụ thuộc thiết bị và định dạng nguồn.
 - Phân tích sóng âm chỉ xét tối đa 15 phút đầu của file.
 - Chỉ dùng nhạc bạn có quyền sử dụng; hãy kiểm tra giấy phép của từng bài.
+
+## Logo
+Logo kiểu liquid glass nằm ở `docs/logo.png` (1024×1024) và ảnh chia sẻ `docs/social-preview.png` (1280×640). Icon ứng dụng dùng hai lớp adaptive (`ic_launcher_bg.png`, `ic_launcher_foreground.png`) kèm lớp đơn sắc cho biểu tượng theo chủ đề của Android 13+.
