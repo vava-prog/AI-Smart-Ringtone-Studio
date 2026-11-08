@@ -68,4 +68,43 @@
     <string name="msg_save_failed">Không lưu được: %1$s</string>
     <string name="msg_playback_error">Không phát được âm thanh này.</string>
     <string name="msg_unknown_error">Lỗi không xác định</string>
+
+    <string name="nav_dashboard">Tổng quan</string>
+    <string name="nav_create">Tạo mới</string>
+    <string name="nav_history">Lịch sử</string>
+    <string name="nav_settings">Cài đặt</string>
+
+    <string name="dash_title">Tổng quan</string>
+    <string name="dash_subtitle">Thống kê các nhạc chuông bạn đã tạo</string>
+    <string name="stat_count">Nhạc chuông</string>
+    <string name="stat_week_fmt">+%1$d trong 7 ngày</string>
+    <string name="stat_duration">Tổng thời lượng</string>
+    <string name="stat_size">Dung lượng</string>
+    <string name="stat_avg">Độ dài trung bình</string>
+    <string name="chart_title">7 ngày gần đây</string>
+    <string name="bitrate_title">Theo chất lượng</string>
+    <string name="recent_title">Hoạt động gần đây</string>
+    <string name="btn_view_all">Xem tất cả</string>
+    <string name="empty_history">Chưa có nhạc chuông nào. Hãy tạo cái đầu tiên!</string>
+    <string name="btn_create_new">Tạo nhạc chuông mới</string>
+
+    <string name="history_title">Lịch sử nhạc chuông</string>
+    <string name="history_meta_fmt">%1$s · %2$d kbps · %3$s</string>
+    <string name="btn_play">▶ Nghe</string>
+    <string name="btn_set_as">Đặt làm…</string>
+    <string name="btn_delete">Xóa</string>
+    <string name="dialog_set_title">Đặt làm</string>
+    <string name="dialog_delete_title">Xóa nhạc chuông?</string>
+    <string name="dialog_delete_text">File này sẽ bị xóa khỏi ứng dụng. Bản đã lưu vào thư mục Ringtones của hệ thống không bị ảnh hưởng.</string>
+
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_defaults">Mặc định cho mỗi lần cắt</string>
+    <string name="settings_defaults_note">Áp dụng khi bạn chọn file mới.</string>
+    <string name="settings_theme">Giao diện</string>
+    <string name="theme_system">Theo hệ thống</string>
+    <string name="theme_light">Sáng</string>
+    <string name="theme_dark">Tối</string>
+    <string name="settings_about">Giới thiệu</string>
+    <string name="about_version_fmt">Phiên bản %1$s</string>
+    <string name="about_text">Mọi xử lý diễn ra hoàn toàn trên máy, ứng dụng không tải dữ liệu nào lên Internet.</string>
 </resources>

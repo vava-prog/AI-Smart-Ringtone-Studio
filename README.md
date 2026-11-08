@@ -6,7 +6,16 @@
 
 Ứng dụng tạo nhạc chuông ngay trên điện thoại: chọn bài hát, cắt đoạn hay nhất, thêm fade, rồi đặt làm nhạc chuông / thông báo / báo thức. Mọi xử lý diễn ra cục bộ trên thiết bị.
 
-## Tính năng hiện có (v0.2.0)
+## Giao diện dashboard (v0.3.0)
+Ứng dụng có thanh điều hướng 4 tab theo bố cục của các mẫu Vue Admin Dashboard, viết lại hoàn toàn bằng Jetpack Compose với phong cách liquid glass:
+- **Tổng quan:** thẻ số liệu (số nhạc chuông, tổng thời lượng, dung lượng, độ dài trung bình), biểu đồ cột 7 ngày, phân bố theo chất lượng và hoạt động gần đây.
+- **Tạo mới:** màn hình cắt nhạc, nghe thử, fade, xuất và đặt làm nhạc chuông.
+- **Lịch sử:** mọi nhạc chuông đã xuất được lưu lại (tối đa 200), có nghe lại, đặt làm nhạc chuông/thông báo/báo thức, chia sẻ và xóa.
+- **Cài đặt:** giá trị mặc định (bitrate, fade, âm lượng) và giao diện sáng/tối/theo hệ thống.
+
+Giao diện lấy cảm hứng từ bố cục của các mẫu dashboard mã nguồn mở, không sao chép mã của dự án nào.
+
+## Tính năng cắt nhạc (v0.2.0)
 - Chọn file âm thanh hoặc video bằng Storage Access Framework; nhận file được chia sẻ hoặc mở từ app khác.
 - Hiển thị sóng âm và **gợi ý đoạn hay nhất** (cửa sổ có năng lượng lớn nhất, tính trên máy, không cần Internet).
 - Chọn đoạn bằng thanh trượt hai đầu, **nghe thử** đoạn đã chọn và kết quả sau khi xuất.
@@ -16,6 +25,7 @@
 - Chia sẻ file kết quả; liên kết tới các nguồn nhạc miễn phí bản quyền (Pixabay, Jamendo, Free Music Archive).
 - Giao diện tiếng Việt và tiếng Anh, giao diện sáng/tối, Material You trên Android 12+.
 - Giữ trạng thái khi xoay màn hình (ViewModel), tự dọn file tạm.
+- Lịch sử và cài đặt được lưu lâu dài trong bộ nhớ riêng của ứng dụng.
 
 ## Chưa có
 - Tìm kiếm/tải nhạc ngay trong app (hiện chỉ có liên kết tới trang nguồn).

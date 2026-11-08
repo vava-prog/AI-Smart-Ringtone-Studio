@@ -1,16 +1,11 @@
 package com.aismart.ringtone
 
-import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -23,22 +18,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,39 +39,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.util.Locale
 import kotlin.math.roundToInt
 
-@Composable
-fun RingtoneTheme(content: @Composable () -> Unit) {
-    val dark = isSystemInDarkTheme()
-    val context = LocalContext.current
-    val scheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
-            if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        dark -> darkColorScheme()
-        else -> lightColorScheme()
-    }
-    MaterialTheme(colorScheme = scheme, content = content)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RingtoneApp(vm: RingtoneViewModel) {
-    RingtoneTheme {
-        Scaffold(
-            topBar = { TopAppBar(title = { Text(stringResource(R.string.app_name)) }) }
-        ) { padding ->
-            RingtoneContent(vm, Modifier.padding(padding))
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
+fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     val picker = rememberLauncherForActivityResult(
@@ -100,44 +62,13 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
         }
     }
 
-    // Android 9 trở xuống cần xin quyền ghi bộ nhớ trước khi lưu vào thư mục Ringtones
-    var pendingSetDefault by remember { mutableStateOf<Boolean?>(null) }
-    val storagePermission = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        val setDefault = pendingSetDefault
-        pendingSetDefault = null
-        if (granted && setDefault != null) {
-            vm.saveToDevice(setDefault)
-        } else {
-            vm.showMessage(R.string.msg_perm_denied)
-        }
-    }
+    val saveRequester = rememberSaveRequester(vm)
 
     fun requestSave(setDefault: Boolean) {
-        if (setDefault && !RingtoneSaver.canWriteSettings(context)) {
-            vm.showMessage(R.string.msg_need_write_settings)
-            try {
-                context.startActivity(
-                    Intent(
-                        Settings.ACTION_MANAGE_WRITE_SETTINGS,
-                        Uri.parse("package:${context.packageName}")
-                    )
-                )
-            } catch (_: ActivityNotFoundException) {
-            }
-            return
-        }
-        val needsStoragePermission = Build.VERSION.SDK_INT <= Build.VERSION_CODES.P &&
-            ContextCompat.checkSelfPermission(
-                context, Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        if (needsStoragePermission) {
-            pendingSetDefault = setDefault
-            storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            return
-        }
-        vm.saveToDevice(setDefault)
+        val file = vm.outputFile ?: return
+        saveRequester(
+            SaveRequest(file, RingtoneMath.safeTitle(vm.sourceName), vm.target, setDefault)
+        )
     }
 
     fun openUrl(url: String) {
@@ -158,7 +89,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
         Text(stringResource(R.string.subtitle), style = MaterialTheme.typography.bodyMedium)
 
         // 1. File nguồn
-        Card(Modifier.fillMaxWidth()) {
+        GlassCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.section_source), style = MaterialTheme.typography.titleMedium)
                 Text(vm.sourceName ?: stringResource(R.string.no_file))
@@ -175,7 +106,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
 
         if (vm.hasSource) {
             // 2. Chọn đoạn
-            Card(Modifier.fillMaxWidth()) {
+            GlassCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(stringResource(R.string.section_range), style = MaterialTheme.typography.titleMedium)
 
@@ -228,7 +159,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
             }
 
             // 3. Tùy chọn âm thanh
-            Card(Modifier.fillMaxWidth()) {
+            GlassCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(stringResource(R.string.section_options), style = MaterialTheme.typography.titleMedium)
 
@@ -283,7 +214,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
             }
 
             // 4. Xuất file
-            Card(Modifier.fillMaxWidth()) {
+            GlassCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(stringResource(R.string.section_export), style = MaterialTheme.typography.titleMedium)
                     Button(
@@ -313,7 +244,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
         // 5. Kết quả
         val file = vm.outputFile
         if (file != null) {
-            Card(Modifier.fillMaxWidth()) {
+            GlassCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(stringResource(R.string.section_result), style = MaterialTheme.typography.titleMedium)
                     Text(stringResource(R.string.result_name_fmt, file.name))
@@ -376,7 +307,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
         }
 
         // Thông báo trạng thái
-        Card(Modifier.fillMaxWidth()) {
+        GlassCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {
                 val msg = vm.message
                 Text(stringResource(msg.res, *msg.args))
@@ -384,7 +315,7 @@ private fun RingtoneContent(vm: RingtoneViewModel, modifier: Modifier) {
         }
 
         // Nguồn nhạc miễn phí bản quyền
-        Card(Modifier.fillMaxWidth()) {
+        GlassCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(R.string.section_sources), style = MaterialTheme.typography.titleMedium)
                 Text(stringResource(R.string.sources_note), style = MaterialTheme.typography.bodySmall)

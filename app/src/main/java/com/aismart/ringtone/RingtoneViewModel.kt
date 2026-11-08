@@ -44,6 +44,9 @@ enum class PlayKind { RANGE, RESULT }
 @OptIn(UnstableApi::class)
 class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
+    private val settings = SettingsStore(app)
+    private val history = HistoryStore(app)
+
     // ---- Trạng thái hiển thị ----
     var sourceUri by mutableStateOf<Uri?>(null)
         private set
@@ -60,13 +63,30 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     var analyzing by mutableStateOf(false)
         private set
 
-    var fadeInSec by mutableFloatStateOf(1f)
+    // Giá trị mặc định (màn hình Cài đặt) và giá trị đang dùng cho lần cắt hiện tại
+    var defaultFadeIn by mutableFloatStateOf(settings.fadeInSec)
         private set
-    var fadeOutSec by mutableFloatStateOf(2f)
+    var defaultFadeOut by mutableFloatStateOf(settings.fadeOutSec)
         private set
-    var volumePercent by mutableIntStateOf(100)
+    var defaultVolume by mutableIntStateOf(settings.volumePercent)
         private set
-    var bitrateKbps by mutableIntStateOf(128)
+    var defaultBitrate by mutableIntStateOf(settings.bitrateKbps)
+        private set
+    var themeMode by mutableIntStateOf(settings.themeMode)
+        private set
+
+    var fadeInSec by mutableFloatStateOf(settings.fadeInSec)
+        private set
+    var fadeOutSec by mutableFloatStateOf(settings.fadeOutSec)
+        private set
+    var volumePercent by mutableIntStateOf(settings.volumePercent)
+        private set
+    var bitrateKbps by mutableIntStateOf(settings.bitrateKbps)
+        private set
+
+    var historyEntries by mutableStateOf<List<HistoryEntry>>(emptyList())
+        private set
+    var playingHistoryId by mutableStateOf<String?>(null)
         private set
 
     var exporting by mutableStateOf(false)
@@ -92,6 +112,12 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     val hasSource: Boolean get() = sourceUri != null && durationMs > 0
     val clipMs: Long get() = endMs - startMs
 
+    init {
+        viewModelScope.launch {
+            historyEntries = withContext(Dispatchers.IO) { history.load() }
+        }
+    }
+
     fun showMessage(@StringRes res: Int) {
         message = Msg(res)
     }
@@ -109,6 +135,10 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         profile = null
         analyzing = false
         outputFile = null
+        fadeInSec = defaultFadeIn
+        fadeOutSec = defaultFadeOut
+        volumePercent = defaultVolume
+        bitrateKbps = defaultBitrate
         message = Msg(R.string.msg_loading)
 
         viewModelScope.launch {
@@ -206,11 +236,11 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         created.setAudioAttributes(AudioAttributes.DEFAULT, true)
         created.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_ENDED) playing = null
+                if (playbackState == Player.STATE_ENDED) clearPlaying()
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                playing = null
+                clearPlaying()
                 message = Msg(R.string.msg_playback_error)
             }
         })
@@ -238,17 +268,27 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         play(MediaItem.fromUri(Uri.fromFile(file)), PlayKind.RESULT)
     }
 
-    private fun play(item: MediaItem, kind: PlayKind) {
+    private fun play(item: MediaItem, kind: PlayKind?, historyId: String? = null) {
         val p = ensurePlayer()
         p.setMediaItem(item)
         p.prepare()
         p.playWhenReady = true
         playing = kind
+        playingHistoryId = historyId
+    }
+
+    fun playHistory(entry: HistoryEntry) {
+        play(MediaItem.fromUri(Uri.fromFile(history.file(entry))), null, entry.id)
     }
 
     fun stopPlayback() {
         player?.stop()
+        clearPlaying()
+    }
+
+    private fun clearPlaying() {
         playing = null
+        playingHistoryId = null
     }
 
     // ---- Xuất file ----
@@ -258,6 +298,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         stopPlayback()
 
         val clip = clipMs
+        val bitrate = bitrateKbps
         val clipUs = clip * 1000L
         val maxFadeUs = clipUs / 2
         val fadeInUs = min((fadeInSec * 1_000_000f).toLong(), maxFadeUs)
@@ -308,6 +349,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
                         progress = 1f
                         outputFile = out
                         message = Msg(R.string.msg_export_done, RingtoneMath.formatSize(out.length()))
+                        recordHistory(out, clip, bitrate)
                     }
 
                     override fun onError(
@@ -371,11 +413,64 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         if (!silent) message = Msg(R.string.msg_export_cancelled)
     }
 
+    // ---- Lịch sử ----
+    private fun recordHistory(file: File, clip: Long, bitrate: Int) {
+        val title = RingtoneMath.safeTitle(sourceName)
+        viewModelScope.launch {
+            try {
+                val entry = withContext(Dispatchers.IO) { history.addFrom(file, title, clip, bitrate) }
+                historyEntries = listOf(entry) + historyEntries
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    fun historyFile(entry: HistoryEntry): File = history.file(entry)
+
+    fun deleteHistory(entry: HistoryEntry) {
+        if (playingHistoryId == entry.id) stopPlayback()
+        historyEntries = historyEntries.filter { it.id != entry.id }
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) { history.delete(entry) }
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    // ---- Cài đặt mặc định ----
+    fun setDefaultFadeIn(value: Float) {
+        defaultFadeIn = value
+        settings.fadeInSec = value
+    }
+
+    fun setDefaultFadeOut(value: Float) {
+        defaultFadeOut = value
+        settings.fadeOutSec = value
+    }
+
+    fun setDefaultVolume(value: Int) {
+        defaultVolume = value
+        settings.volumePercent = value
+    }
+
+    fun setDefaultBitrate(value: Int) {
+        defaultBitrate = value
+        settings.bitrateKbps = value
+    }
+
+    fun selectThemeMode(mode: Int) {
+        themeMode = mode
+        settings.themeMode = mode
+    }
+
     // ---- Lưu và đặt làm nhạc chuông ----
     fun saveToDevice(setAsDefault: Boolean) {
         val file = outputFile ?: return
-        val chosen = target
-        val title = RingtoneMath.safeTitle(sourceName)
+        saveFile(file, RingtoneMath.safeTitle(sourceName), target, setAsDefault)
+    }
+
+    fun saveFile(file: File, title: String, chosen: RingtoneTarget, setAsDefault: Boolean) {
         viewModelScope.launch {
             try {
                 val uri = withContext(Dispatchers.IO) {

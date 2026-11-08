@@ -22,6 +22,19 @@ object RingtoneMath {
         return String.format(Locale.ROOT, "%d:%02d.%d", minutes, seconds, tenths)
     }
 
+    /** Thời lượng tổng quát: "5s", "2m 30s" hoặc "1h 02m". */
+    fun formatDuration(ms: Long): String {
+        val totalSeconds = max(0L, ms) / 1000
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+        return when {
+            hours > 0 -> String.format(Locale.ROOT, "%dh %02dm", hours, minutes)
+            minutes > 0 -> String.format(Locale.ROOT, "%dm %02ds", minutes, seconds)
+            else -> "${seconds}s"
+        }
+    }
+
     fun formatSize(bytes: Long, locale: Locale = Locale.getDefault()): String {
         return if (bytes < 1024L * 1024L) {
             String.format(locale, "%.0f KB", bytes / 1024.0)
