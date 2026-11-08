@@ -439,22 +439,22 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     // ---- Cài đặt mặc định ----
-    fun setDefaultFadeIn(value: Float) {
+    fun updateDefaultFadeIn(value: Float) {
         defaultFadeIn = value
         settings.fadeInSec = value
     }
 
-    fun setDefaultFadeOut(value: Float) {
+    fun updateDefaultFadeOut(value: Float) {
         defaultFadeOut = value
         settings.fadeOutSec = value
     }
 
-    fun setDefaultVolume(value: Int) {
+    fun updateDefaultVolume(value: Int) {
         defaultVolume = value
         settings.volumePercent = value
     }
 
-    fun setDefaultBitrate(value: Int) {
+    fun updateDefaultBitrate(value: Int) {
         defaultBitrate = value
         settings.bitrateKbps = value
     }

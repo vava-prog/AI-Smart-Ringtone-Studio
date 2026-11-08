@@ -61,7 +61,7 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                 Text(stringResource(R.string.fade_in_label, oneDecimal(vm.defaultFadeIn)))
                 Slider(
                     value = vm.defaultFadeIn,
-                    onValueChange = { vm.setDefaultFadeIn((it * 2f).roundToInt() / 2f) },
+                    onValueChange = { vm.updateDefaultFadeIn((it * 2f).roundToInt() / 2f) },
                     valueRange = 0f..5f,
                     steps = 9
                 )
@@ -69,7 +69,7 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                 Text(stringResource(R.string.fade_out_label, oneDecimal(vm.defaultFadeOut)))
                 Slider(
                     value = vm.defaultFadeOut,
-                    onValueChange = { vm.setDefaultFadeOut((it * 2f).roundToInt() / 2f) },
+                    onValueChange = { vm.updateDefaultFadeOut((it * 2f).roundToInt() / 2f) },
                     valueRange = 0f..5f,
                     steps = 9
                 )
@@ -77,7 +77,7 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                 Text(stringResource(R.string.volume_label, vm.defaultVolume))
                 Slider(
                     value = vm.defaultVolume.toFloat(),
-                    onValueChange = { vm.setDefaultVolume((it / 10f).roundToInt() * 10) },
+                    onValueChange = { vm.updateDefaultVolume((it / 10f).roundToInt() * 10) },
                     valueRange = 50f..150f,
                     steps = 9
                 )
@@ -87,7 +87,7 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                     listOf(64, 96, 128, 192).forEach { kbps ->
                         FilterChip(
                             selected = vm.defaultBitrate == kbps,
-                            onClick = { vm.setDefaultBitrate(kbps) },
+                            onClick = { vm.updateDefaultBitrate(kbps) },
                             label = { Text("$kbps") }
                         )
                     }
