@@ -39,8 +39,8 @@ class SmartPickerTest {
     fun picker_choosesLoudSection() {
         val result = SmartPicker.pick(analysis(100, 160), 15_000, 60_000)
         assertTrue(result.isNotEmpty())
-        assertEquals(25_000L, result[0].startMs, 500.0)
-        assertEquals(15_000L, result[0].endMs - result[0].startMs, 0.0)
+        assertEquals(25_000.0, result[0].startMs.toDouble(), 500.0)
+        assertEquals(15_000L, result[0].endMs - result[0].startMs)
     }
 
     @Test
