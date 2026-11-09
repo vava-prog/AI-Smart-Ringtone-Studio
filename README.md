@@ -101,3 +101,7 @@ Opus/OGG/FLAC chưa được hỗ trợ vì Android không có bộ mã hóa tí
 - **Giới hạn đỉnh** (trần −0,3 dBFS) để chống rè khi tăng bass/preamp.
 - **Chỉnh mịn điểm cắt** theo bước 10 ms / 0,1 s / 1 s, sóng âm phóng to quanh điểm bắt đầu/kết thúc và nghe thử 2 giây ở mỗi đầu.
 - Hiệu ứng áp dụng cho cả M4A, MP3 và WAV khi xuất.
+
+## Khám phá nhạc / Music discovery
+
+Tab **Khám phá** tìm nhạc có giấy phép mở (Openverse, Internet Archive, Jamendo nếu có client_id), nghe thử, tải về và đưa vào tab Tạo mới kèm thông tin tác giả/giấy phép. Chỉ hiện nhạc cho phép chỉnh sửa (loại giấy phép ND). Mục "Bài đang được nghe nhiều" lấy từ bảng xếp hạng Deezer chỉ để tham khảo xu hướng, không có âm thanh. Ứng dụng **không** tải nhạc từ YouTube/TikTok. Đây là phần duy nhất dùng Internet (quyền `INTERNET`).

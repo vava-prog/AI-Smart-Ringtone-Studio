@@ -135,6 +135,13 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.section_source), style = MaterialTheme.typography.titleMedium)
                 Text(vm.sourceName ?: stringResource(R.string.no_file))
+                vm.credit?.let { credit ->
+                    Text(
+                        stringResource(R.string.credit_fmt, credit.text),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 if (vm.hasSource) {
                     Text(stringResource(R.string.duration_fmt, RingtoneMath.formatTime(vm.durationMs)))
                 }

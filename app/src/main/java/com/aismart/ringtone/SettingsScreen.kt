@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -122,6 +123,24 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                         )
                     }
                 }
+            }
+        }
+
+        GlassCard(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.jamendo_title), style = MaterialTheme.typography.titleMedium)
+                OutlinedTextField(
+                    value = vm.jamendoClientId,
+                    onValueChange = { vm.updateJamendoId(it) },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.jamendo_label)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    stringResource(R.string.jamendo_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
 

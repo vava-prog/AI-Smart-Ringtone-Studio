@@ -106,7 +106,7 @@
     <string name="theme_dark">Dark</string>
     <string name="settings_about">About</string>
     <string name="about_version_fmt">Version %1$s</string>
-    <string name="about_text">Everything is processed on your device. The app does not upload any data to the Internet.</string>
+    <string name="about_text">All audio processing happens on your device and your files are never uploaded. Only the Discover tab uses the Internet, to find and download openly licensed music.</string>
 
     <string name="section_link">YouTube / TikTok link (optional)</string>
     <string name="label_link">Paste the video link</string>
@@ -150,4 +150,31 @@
     <string name="pick_peak">Peak</string>
     <string name="pick_intro">Intro</string>
     <string name="bpm_fmt">Estimated tempo: %1$d BPM. Cut points snap to the beat.</string>
+
+    <string name="nav_discover">Discover</string>
+    <string name="discover_title">Discover music</string>
+    <string name="license_note">Only music whose license allows editing (no ND clause) is shown. Credit the source as the license requires; the source link is kept in History.</string>
+    <string name="label_search">Title, artist or keyword</string>
+    <string name="btn_search">Search music</string>
+    <string name="discover_loading">Searching…</string>
+    <string name="discover_empty">No matching results.</string>
+    <string name="discover_error_fmt">Could not load data: %1$s</string>
+    <string name="discover_rate_limited">The service is limiting searches. Try again in a few minutes or pick another source.</string>
+    <string name="discover_no_download">This track cannot be downloaded.</string>
+    <string name="discover_no_audio">No audio file found in this item.</string>
+    <string name="discover_too_big">File too large (40 MB max).</string>
+    <string name="discover_downloading">Downloading… %1$d%%</string>
+    <string name="btn_use_track">Use for ringtone</string>
+    <string name="btn_original_page">Original page</string>
+    <string name="btn_retry">Retry</string>
+    <string name="src_openverse">Openverse</string>
+    <string name="src_archive">Internet Archive</string>
+    <string name="src_jamendo">Jamendo</string>
+    <string name="trending_title">Popular right now</string>
+    <string name="trending_note">Short-video platforms have no public API, so this is a popular-music chart for trend reference. The app does not download music from YouTube or TikTok.</string>
+    <string name="btn_find_free">Find a free version</string>
+    <string name="credit_fmt">Music credit: %1$s</string>
+    <string name="jamendo_title">Jamendo (optional)</string>
+    <string name="jamendo_label">client_id</string>
+    <string name="jamendo_note">Register for free at developer.jamendo.com and paste your client_id to enable Jamendo in Discover.</string>
 </resources>

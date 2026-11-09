@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Chỉ dùng cho mục Khám phá nhạc (tìm và tải nhạc có giấy phép mở) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Cho phép đặt file làm nhạc chuông / thông báo / báo thức mặc định của hệ thống -->
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"

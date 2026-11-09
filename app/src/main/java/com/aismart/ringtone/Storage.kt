@@ -119,6 +119,11 @@ class HistoryStore(context: Context) {
 class SettingsStore(context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
+    /** client_id Jamendo do người dùng tự đăng ký (tùy chọn). */
+    var jamendoClientId: String
+        get() = prefs.getString("jamendo_client_id", "") ?: ""
+        set(value) = prefs.edit().putString("jamendo_client_id", value.trim()).apply()
+
     /** Đuôi file của định dạng mặc định (m4a, mp3, wav). */
     var formatExt: String
         get() = prefs.getString("format", "m4a") ?: "m4a"

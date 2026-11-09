@@ -29,8 +29,9 @@ import androidx.core.view.WindowCompat
 
 private const val TAB_DASHBOARD = 0
 private const val TAB_CREATE = 1
-private const val TAB_HISTORY = 2
-private const val TAB_SETTINGS = 3
+private const val TAB_DISCOVER = 2
+private const val TAB_HISTORY = 3
+private const val TAB_SETTINGS = 4
 
 @Composable
 private fun RingtoneTheme(dark: Boolean, content: @Composable () -> Unit) {
@@ -108,6 +109,7 @@ fun RingtoneApp(vm: RingtoneViewModel) {
                     ) {
                         NavItem("📊", R.string.nav_dashboard, tab == TAB_DASHBOARD) { tab = TAB_DASHBOARD }
                         NavItem("✂️", R.string.nav_create, tab == TAB_CREATE) { tab = TAB_CREATE }
+                        NavItem("🔎", R.string.nav_discover, tab == TAB_DISCOVER) { tab = TAB_DISCOVER }
                         NavItem("🕘", R.string.nav_history, tab == TAB_HISTORY) { tab = TAB_HISTORY }
                         NavItem("⚙️", R.string.nav_settings, tab == TAB_SETTINGS) { tab = TAB_SETTINGS }
                     }
@@ -122,6 +124,7 @@ fun RingtoneApp(vm: RingtoneViewModel) {
                         modifier = content
                     )
                     TAB_CREATE -> CreateScreen(vm, content)
+                    TAB_DISCOVER -> DiscoverScreen(vm, content)
                     TAB_HISTORY -> HistoryScreen(vm, content)
                     else -> SettingsScreen(vm, content)
                 }

@@ -41,6 +41,9 @@ import kotlin.math.roundToInt
 /** Một thông báo có thể dịch: id chuỗi + tham số. */
 class Msg(@StringRes val res: Int, vararg val args: Any)
 
+/** Ghi nguồn cho nhạc lấy từ mạng: nội dung hiển thị và link trang gốc. */
+data class Credit(val text: String, val url: String)
+
 enum class PlayKind { RANGE, RESULT }
 
 @OptIn(UnstableApi::class)
@@ -114,6 +117,15 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     var zoomEndView by mutableStateOf<ZoomView?>(null)
         private set
 
+    var jamendoClientId by mutableStateOf(settings.jamendoClientId)
+        private set
+
+    /** Nguồn/giấy phép của bài đang mở (nếu lấy từ tab Khám phá). */
+    var credit by mutableStateOf<Credit?>(null)
+        private set
+
+    val discover = DiscoverController(app, viewModelScope) { jamendoClientId }
+
     var sourceLink by mutableStateOf("")
         private set
     var openCreateTick by mutableIntStateOf(0)
@@ -173,9 +185,10 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     // ---- Chọn file nguồn ----
-    fun loadSource(uri: Uri) {
+    fun loadSource(uri: Uri, newCredit: Credit? = null) {
         cancelExport(silent = true)
         stopPlayback()
+        credit = newCredit
         analysisJob?.cancel()
         zoomJob?.cancel()
         zoomStartView = null
@@ -344,6 +357,42 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         onSettingsChanged()
     }
 
+    fun updateJamendoId(text: String) {
+        jamendoClientId = text.trim()
+        settings.jamendoClientId = text
+        if (jamendoClientId.isEmpty() && discover.source == OnlineSource.JAMENDO) {
+            discover.chooseSource(OnlineSource.OPENVERSE)
+        }
+    }
+
+    /** Nghe thử một bài trực tuyến; bấm lần nữa để dừng. */
+    fun previewOnline(track: OnlineTrack) {
+        val key = "online:${track.id}"
+        if (playingHistoryId == key) {
+            stopPlayback()
+            return
+        }
+        viewModelScope.launch {
+            val resolved = discover.resolve(track) ?: return@launch
+            val url = resolved.previewUrl ?: resolved.audioUrl ?: return@launch
+            play(MediaItem.fromUri(Uri.parse(url)), null, key)
+        }
+    }
+
+    /** Tải bài về, mở trong tab Tạo mới kèm thông tin nguồn/giấy phép. */
+    fun useOnlineTrack(track: OnlineTrack) {
+        stopPlayback()
+        viewModelScope.launch {
+            val file = discover.download(track) ?: return@launch
+            val artist = if (track.artist.isNotBlank()) " — ${track.artist}" else ""
+            loadSource(
+                Uri.fromFile(file),
+                Credit("${track.title}$artist (${track.license})", track.pageUrl)
+            )
+            openCreateTick++
+        }
+    }
+
     fun selectPreset(preset: EqPreset) {
         preampDb = preset.preampDb
         eqBands = preset.bands
@@ -507,7 +556,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         val clip = clipMs
         val fmt = format
         val bitrate = if (fmt.usesBitrate) bitrateKbps else 0
-        val link = SourceLinks.parse(sourceLink)?.url
+        val link = SourceLinks.parse(sourceLink)?.url ?: credit?.url
         val clipUs = clip * 1000L
         val maxFadeUs = clipUs / 2
         val fadeInUs = min((fadeInSec * 1_000_000f).toLong(), maxFadeUs)

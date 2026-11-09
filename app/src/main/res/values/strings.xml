@@ -106,7 +106,7 @@
     <string name="theme_dark">Tối</string>
     <string name="settings_about">Giới thiệu</string>
     <string name="about_version_fmt">Phiên bản %1$s</string>
-    <string name="about_text">Mọi xử lý diễn ra hoàn toàn trên máy, ứng dụng không tải dữ liệu nào lên Internet.</string>
+    <string name="about_text">Mọi xử lý âm thanh diễn ra trên máy, ứng dụng không tải file của bạn lên Internet. Chỉ mục Khám phá mới dùng Internet để tìm và tải nhạc có giấy phép mở.</string>
 
     <string name="section_link">Link YouTube / TikTok (tùy chọn)</string>
     <string name="label_link">Dán link video</string>
@@ -150,4 +150,31 @@
     <string name="pick_peak">Cao trào</string>
     <string name="pick_intro">Mở đầu</string>
     <string name="bpm_fmt">Nhịp ước tính: %1$d BPM. Điểm cắt được khớp theo nhịp.</string>
+
+    <string name="nav_discover">Khám phá</string>
+    <string name="discover_title">Khám phá nhạc</string>
+    <string name="license_note">Chỉ hiện nhạc có giấy phép cho phép chỉnh sửa (không có điều khoản ND). Khi dùng, hãy ghi nguồn theo giấy phép; link nguồn được lưu trong Lịch sử.</string>
+    <string name="label_search">Tên bài, nghệ sĩ hoặc từ khóa</string>
+    <string name="btn_search">Tìm nhạc</string>
+    <string name="discover_loading">Đang tìm…</string>
+    <string name="discover_empty">Không tìm thấy kết quả phù hợp.</string>
+    <string name="discover_error_fmt">Không tải được dữ liệu: %1$s</string>
+    <string name="discover_rate_limited">Dịch vụ đang giới hạn lượt tìm. Hãy thử lại sau ít phút hoặc chọn nguồn khác.</string>
+    <string name="discover_no_download">Bài này không cho tải về.</string>
+    <string name="discover_no_audio">Không tìm thấy file âm thanh trong mục này.</string>
+    <string name="discover_too_big">File quá lớn (tối đa 40 MB).</string>
+    <string name="discover_downloading">Đang tải… %1$d%%</string>
+    <string name="btn_use_track">Dùng tạo nhạc chuông</string>
+    <string name="btn_original_page">Trang gốc</string>
+    <string name="btn_retry">Thử lại</string>
+    <string name="src_openverse">Openverse</string>
+    <string name="src_archive">Internet Archive</string>
+    <string name="src_jamendo">Jamendo</string>
+    <string name="trending_title">Bài đang được nghe nhiều</string>
+    <string name="trending_note">Các nền tảng video ngắn không có API công khai, nên đây là bảng xếp hạng nhạc phổ biến để tham khảo xu hướng. Ứng dụng không tải nhạc từ YouTube hay TikTok.</string>
+    <string name="btn_find_free">Tìm bản miễn phí</string>
+    <string name="credit_fmt">Nguồn nhạc: %1$s</string>
+    <string name="jamendo_title">Jamendo (tùy chọn)</string>
+    <string name="jamendo_label">client_id</string>
+    <string name="jamendo_note">Đăng ký miễn phí tại developer.jamendo.com rồi dán client_id để bật nguồn Jamendo trong mục Khám phá.</string>
 </resources>
