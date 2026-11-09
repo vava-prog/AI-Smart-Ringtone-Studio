@@ -145,4 +145,9 @@
     <string name="label_zoom_end">Around the end point</string>
     <string name="btn_listen_start">▶ Play first 2 s of the clip</string>
     <string name="btn_listen_end">▶ Play last 2 s of the clip</string>
+
+    <string name="pick_chorus">Chorus</string>
+    <string name="pick_peak">Peak</string>
+    <string name="pick_intro">Intro</string>
+    <string name="bpm_fmt">Estimated tempo: %1$d BPM. Cut points snap to the beat.</string>
 </resources>

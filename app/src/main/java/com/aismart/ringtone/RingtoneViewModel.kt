@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 /** Một thông báo có thể dịch: id chuỗi + tham số. */
 class Msg(@StringRes val res: Int, vararg val args: Any)
@@ -60,6 +61,12 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     var endMs by mutableLongStateOf(0L)
         private set
     var profile by mutableStateOf<List<Float>?>(null)
+        private set
+    /** Các đoạn do bộ chọn thông minh gợi ý (tối đa 3). */
+    var pickCandidates by mutableStateOf<List<PickCandidate>>(emptyList())
+        private set
+    /** Tempo ước tính (BPM) nếu nhận ra được nhịp. */
+    var bpm by mutableStateOf<Int?>(null)
         private set
     var analyzing by mutableStateOf(false)
         private set
@@ -132,6 +139,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
     // ---- Nội bộ ----
     private var analysisJob: Job? = null
+    private var analysisData: TrackAnalysis? = null
     private var progressJob: Job? = null
     private var encodeJob: Job? = null
     private var measureJob: Job? = null
@@ -178,6 +186,9 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         startMs = 0L
         endMs = 0L
         profile = null
+        analysisData = null
+        pickCandidates = emptyList()
+        bpm = null
         analyzing = false
         outputFile = null
         fadeInSec = defaultFadeIn
@@ -210,9 +221,13 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         analysisJob?.cancel()
         analysisJob = viewModelScope.launch {
             analyzing = true
-            val result = AudioAnalyzer.energyProfile(app, uri, duration)
+            val result = AudioAnalyzer.analyze(app, uri, duration)
             if (sourceUri == uri) {
-                profile = result
+                analysisData = result
+                profile = result?.rms
+                bpm = result?.beat
+                    ?.takeIf { it.confidence >= BeatTracker.MIN_CONFIDENCE }
+                    ?.bpm?.roundToInt()
                 analyzing = false
                 if (result == null) message = Msg(R.string.msg_analysis_failed)
             }
@@ -286,18 +301,21 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun smartPick() {
-        val data = profile ?: return
+        val data = analysisData ?: return
         if (!hasSource) return
         val length = (if (clipMs >= RingtoneMath.MIN_CLIP_MS) clipMs else RingtoneMath.DEFAULT_CLIP_MS)
             .coerceAtMost(durationMs)
-        val windowBuckets = (length / RingtoneMath.BUCKET_MS).toInt().coerceAtLeast(1)
-        val bucket = RingtoneMath.smartPickStartBucket(data, windowBuckets)
-        val newStart = (bucket * RingtoneMath.BUCKET_MS).coerceAtMost(durationMs - length).coerceAtLeast(0L)
-        startMs = newStart
-        endMs = newStart + length
-        onSettingsChanged()
-        scheduleZoom()
+        val candidates = SmartPicker.pick(data, length, durationMs)
+        if (candidates.isEmpty()) return
+        pickCandidates = candidates
+        applyCandidate(candidates[0])
         message = Msg(R.string.msg_smart_done)
+    }
+
+    /** Áp dụng một đoạn gợi ý. */
+    fun applyCandidate(candidate: PickCandidate) {
+        if (!hasSource) return
+        setRange(candidate.startMs, candidate.endMs)
     }
 
     // ---- Tùy chọn âm thanh ----

@@ -210,6 +210,31 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                         enabled = vm.profile != null && !vm.exporting,
                         modifier = Modifier.fillMaxWidth()
                     ) { Text(stringResource(R.string.btn_smart_pick)) }
+                    if (vm.pickCandidates.isNotEmpty()) {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            vm.pickCandidates.forEach { candidate ->
+                                FilterChip(
+                                    selected = vm.startMs == candidate.startMs && vm.endMs == candidate.endMs,
+                                    onClick = { vm.applyCandidate(candidate) },
+                                    enabled = !vm.exporting,
+                                    label = {
+                                        Text(
+                                            stringResource(candidate.kind.labelRes) + " " +
+                                                RingtoneMath.formatTime(candidate.startMs) + "–" +
+                                                RingtoneMath.formatTime(candidate.endMs)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    vm.bpm?.let { bpm ->
+                        Text(
+                            stringResource(R.string.bpm_fmt, bpm),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
 
                     OutlinedButton(
                         onClick = {

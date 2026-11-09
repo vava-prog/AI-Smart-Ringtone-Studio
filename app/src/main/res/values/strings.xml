@@ -145,4 +145,9 @@
     <string name="label_zoom_end">Quanh điểm kết thúc</string>
     <string name="btn_listen_start">▶ Nghe 2 giây đầu đoạn</string>
     <string name="btn_listen_end">▶ Nghe 2 giây cuối đoạn</string>
+
+    <string name="pick_chorus">Điệp khúc</string>
+    <string name="pick_peak">Cao trào</string>
+    <string name="pick_intro">Mở đầu</string>
+    <string name="bpm_fmt">Nhịp ước tính: %1$d BPM. Điểm cắt được khớp theo nhịp.</string>
 </resources>

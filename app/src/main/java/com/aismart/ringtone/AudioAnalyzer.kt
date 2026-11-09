@@ -55,10 +55,10 @@ object AudioAnalyzer {
     }
 
     /**
-     * Trả về năng lượng (RMS, đã chuẩn hóa 0..1) cho mỗi ô [RingtoneMath.BUCKET_MS] ms,
-     * hoặc null nếu không giải mã được.
+     * Phân tích đặc trưng: năng lượng (RMS), độ sáng, độ nhấn nhịp và lưới nhịp
+     * (đã chuẩn hóa 0..1), hoặc null nếu không giải mã được.
      */
-    suspend fun energyProfile(context: Context, uri: Uri, durationMs: Long): List<Float>? {
+    suspend fun analyze(context: Context, uri: Uri, durationMs: Long): TrackAnalysis? {
         val bucketCount = ((durationMs + RingtoneMath.BUCKET_MS - 1) / RingtoneMath.BUCKET_MS)
             .toInt()
             .coerceAtLeast(1)
@@ -71,12 +71,14 @@ object AudioAnalyzer {
         }
     }
 
+    private const val HOP_MS = 25
+
     private fun decodeEnergy(
         context: Context,
         uri: Uri,
         bucketCount: Int,
         cancelled: () -> Boolean
-    ): List<Float>? {
+    ): TrackAnalysis? {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
         try {
@@ -104,6 +106,11 @@ object AudioAnalyzer {
 
             val sumSquares = DoubleArray(bucketCount)
             val counts = LongArray(bucketCount)
+            val zeroCross = LongArray(bucketCount)
+            val hopCount = (bucketCount.toLong() * RingtoneMath.BUCKET_MS / HOP_MS + 2).toInt()
+            val envSum = DoubleArray(hopCount)
+            val envCount = IntArray(hopCount)
+            var prevPositive = true
             var sampleRate = trackFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
             var channels = trackFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
             var pcmEncoding = AudioFormat.ENCODING_PCM_16BIT
@@ -148,6 +155,7 @@ object AudioAnalyzer {
                             val frames = info.size / (bytesPerSample * channelCount)
                             for (f in 0 until frames) {
                                 var acc = 0.0
+                                var mono = 0.0
                                 for (c in 0 until channelCount) {
                                     val v = if (isFloat) {
                                         outBuffer.getFloat().toDouble()
@@ -155,13 +163,23 @@ object AudioAnalyzer {
                                         outBuffer.getShort() / 32768.0
                                     }
                                     acc += v * v
+                                    mono += v
+                                }
+                                mono /= channelCount
+                                val positive = mono >= 0.0
+                                val hop = (frameIndex * 1000L / (sampleRate.toLong() * HOP_MS)).toInt()
+                                if (hop in 0 until hopCount) {
+                                    envSum[hop] += kotlin.math.abs(mono)
+                                    envCount[hop]++
                                 }
                                 val bucket = (frameIndex * 1000L /
                                     (sampleRate.toLong() * RingtoneMath.BUCKET_MS)).toInt()
                                 if (bucket in 0 until bucketCount) {
                                     sumSquares[bucket] += acc / channelCount
                                     counts[bucket]++
+                                    if (positive != prevPositive) zeroCross[bucket]++
                                 }
+                                prevPositive = positive
                                 frameIndex++
                             }
                         }
@@ -191,7 +209,29 @@ object AudioAnalyzer {
             }
             val peak = rms.maxOrNull() ?: 0f
             if (peak <= 0f) return null
-            return rms.map { it / peak }
+
+            val bright = FloatArray(bucketCount) { i ->
+                if (counts[i] > 0) zeroCross[i].toFloat() / counts[i] else 0f
+            }
+            val brightPeak = bright.maxOrNull() ?: 0f
+            if (brightPeak > 0f) for (i in bright.indices) bright[i] /= brightPeak
+
+            // Đường onset: phần tăng dương của đường bao biên độ theo từng 25 ms
+            val envelope = FloatArray(hopCount) { k ->
+                if (envCount[k] > 0) (envSum[k] / envCount[k]).toFloat() else 0f
+            }
+            val onset = FloatArray(hopCount)
+            for (k in 1 until hopCount) onset[k] = max(0f, envelope[k] - envelope[k - 1])
+            val onsetPeak = onset.maxOrNull() ?: 0f
+            if (onsetPeak > 0f) for (k in onset.indices) onset[k] /= onsetPeak
+
+            return TrackAnalysis(
+                rms = rms.map { it / peak },
+                bright = bright.toList(),
+                onsetFine = onset,
+                onsetHopMs = HOP_MS,
+                beat = BeatTracker.estimate(onset, HOP_MS)
+            )
         } finally {
             try {
                 codec?.stop()
