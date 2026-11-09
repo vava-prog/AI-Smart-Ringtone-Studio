@@ -89,6 +89,24 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     var format by mutableStateOf(OutputFormat.fromExt(settings.formatExt))
         private set
 
+    // Hiệu ứng âm thanh (giữ nguyên khi đổi file trong cùng phiên)
+    var preampDb by mutableFloatStateOf(0f)
+        private set
+    var eqBands by mutableStateOf(EqPreset.FLAT.bands)
+        private set
+    var normalizeOn by mutableStateOf(false)
+        private set
+    var limiterOn by mutableStateOf(false)
+        private set
+
+    // Phóng to quanh điểm cắt
+    var zoomOn by mutableStateOf(false)
+        private set
+    var zoomStartView by mutableStateOf<ZoomView?>(null)
+        private set
+    var zoomEndView by mutableStateOf<ZoomView?>(null)
+        private set
+
     var sourceLink by mutableStateOf("")
         private set
     var openCreateTick by mutableIntStateOf(0)
@@ -116,6 +134,8 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     private var analysisJob: Job? = null
     private var progressJob: Job? = null
     private var encodeJob: Job? = null
+    private var measureJob: Job? = null
+    private var zoomJob: Job? = null
     private var transformer: Transformer? = null
     private var pendingOutput: File? = null
     private var player: ExoPlayer? = null
@@ -149,6 +169,9 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         cancelExport(silent = true)
         stopPlayback()
         analysisJob?.cancel()
+        zoomJob?.cancel()
+        zoomStartView = null
+        zoomEndView = null
         sourceUri = uri
         sourceName = null
         durationMs = 0L
@@ -179,6 +202,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
             endMs = min(duration, RingtoneMath.DEFAULT_CLIP_MS)
             message = Msg(R.string.msg_picked)
             startAnalysis(uri, duration)
+            scheduleZoom()
         }
     }
 
@@ -203,6 +227,62 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         startMs = range.startMs
         endMs = range.endMs
         onSettingsChanged()
+        scheduleZoom()
+    }
+
+    /** Dịch điểm bắt đầu [deltaMs] mili giây (âm = lùi). */
+    fun nudgeStart(deltaMs: Long) = setRange(startMs + deltaMs, endMs)
+
+    /** Dịch điểm kết thúc [deltaMs] mili giây (âm = lùi). */
+    fun nudgeEnd(deltaMs: Long) = setRange(startMs, endMs + deltaMs)
+
+    fun toggleZoom(on: Boolean) {
+        zoomOn = on
+        if (on) {
+            scheduleZoom()
+        } else {
+            zoomJob?.cancel()
+            zoomStartView = null
+            zoomEndView = null
+        }
+    }
+
+    private fun scheduleZoom() {
+        if (!zoomOn) return
+        val uri = sourceUri ?: return
+        if (durationMs <= 0L) return
+        zoomJob?.cancel()
+        val s = startMs
+        val e = endMs
+        val d = durationMs
+        zoomJob = viewModelScope.launch {
+            delay(350)
+            val startView = withContext(Dispatchers.Default) { zoomAround(uri, s, d) { !isActive } }
+            val endView = withContext(Dispatchers.Default) { zoomAround(uri, e, d) { !isActive } }
+            if (sourceUri == uri) {
+                zoomStartView = startView
+                zoomEndView = endView
+            }
+        }
+    }
+
+    private fun zoomAround(uri: Uri, boundaryMs: Long, duration: Long, cancelled: () -> Boolean): ZoomView? {
+        return try {
+            val from = (boundaryMs - ZOOM_HALF_MS).coerceAtLeast(0L)
+            val to = (boundaryMs + ZOOM_HALF_MS).coerceAtMost(duration)
+            if (to - from < 200L) return null
+            val result = RangeScanner.scan(app, uri, from, to, ZOOM_BARS, cancelled)
+            val top = result.buckets.maxOrNull() ?: 0f
+            if (top <= 0f) return null
+            ZoomView(
+                peaks = result.buckets.map { it / top },
+                marker = (boundaryMs - from).toFloat() / (to - from)
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun smartPick() {
@@ -216,6 +296,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         startMs = newStart
         endMs = newStart + length
         onSettingsChanged()
+        scheduleZoom()
         message = Msg(R.string.msg_smart_done)
     }
 
@@ -242,6 +323,34 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun selectFormat(newFormat: OutputFormat) {
         format = newFormat
+        onSettingsChanged()
+    }
+
+    fun selectPreset(preset: EqPreset) {
+        preampDb = preset.preampDb
+        eqBands = preset.bands
+        onSettingsChanged()
+    }
+
+    fun changePreamp(db: Float) {
+        preampDb = db
+        onSettingsChanged()
+    }
+
+    fun changeBand(index: Int, db: Float) {
+        if (index !in 0 until EqConfig.COUNT) return
+        eqBands = eqBands.toMutableList().also { it[index] = db }
+        onSettingsChanged()
+    }
+
+    fun toggleNormalize(on: Boolean) {
+        normalizeOn = on
+        if (on) limiterOn = true
+        onSettingsChanged()
+    }
+
+    fun toggleLimiter(on: Boolean) {
+        limiterOn = on
         onSettingsChanged()
     }
 
@@ -291,6 +400,24 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         play(item, PlayKind.RANGE)
     }
 
+    /** Nghe 2 giây quanh điểm bắt đầu (đầu đoạn) hoặc điểm kết thúc (cuối đoạn). */
+    fun playEdge(atStart: Boolean) {
+        val uri = sourceUri ?: return
+        if (!hasSource) return
+        val from = if (atStart) startMs else maxOf(startMs, endMs - EDGE_PREVIEW_MS)
+        val to = if (atStart) minOf(endMs, startMs + EDGE_PREVIEW_MS) else endMs
+        val item = MediaItem.Builder()
+            .setUri(uri)
+            .setClippingConfiguration(
+                MediaItem.ClippingConfiguration.Builder()
+                    .setStartPositionMs(from)
+                    .setEndPositionMs(to)
+                    .build()
+            )
+            .build()
+        play(item, PlayKind.RANGE)
+    }
+
     fun playResult() {
         val file = outputFile ?: return
         play(MediaItem.fromUri(Uri.fromFile(file)), PlayKind.RESULT)
@@ -325,6 +452,40 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         if (!hasSource || exporting) return
         stopPlayback()
 
+        if (!normalizeOn) {
+            startExport(uri, 1f)
+            return
+        }
+
+        // Chuẩn hóa: đo đỉnh biên độ của đoạn đã chọn trước rồi mới xuất
+        val from = startMs
+        val to = endMs
+        outputFile = null
+        progress = 0f
+        exporting = true
+        message = Msg(R.string.msg_measuring)
+        measureJob?.cancel()
+        measureJob = viewModelScope.launch {
+            try {
+                val peak = withContext(Dispatchers.Default) {
+                    RangeScanner.scan(app, uri, from, to, 1) { !isActive }.peak
+                }
+                val normalizeGain = if (peak > 0.001f) {
+                    (NORMALIZE_TARGET / peak).coerceIn(0.25f, 8f)
+                } else {
+                    1f
+                }
+                startExport(uri, normalizeGain)
+            } catch (c: CancellationException) {
+                throw c
+            } catch (_: Exception) {
+                startExport(uri, 1f)
+            }
+        }
+    }
+
+    private fun startExport(uri: Uri, normalizeGain: Float) {
+        val effects = EffectSettings(preampDb, eqBands, normalizeGain, limiterOn)
         val clip = clipMs
         val fmt = format
         val bitrate = if (fmt.usesBitrate) bitrateKbps else 0
@@ -346,12 +507,12 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
         // MP3 và WAV: tự giải mã và mã hóa; M4A: dùng Media3 Transformer
         if (fmt != OutputFormat.M4A) {
-            exportWithEncoder(uri, fmt, out, clip, bitrate, link, fadeInUs, fadeOutUs, gain)
+            exportWithEncoder(uri, fmt, out, clip, bitrate, link, fadeInUs, fadeOutUs, gain, effects)
             return
         }
 
         try {
-            val processor = FadeGainAudioProcessor(clipUs, fadeInUs, fadeOutUs, gain)
+            val processor = FadeGainAudioProcessor(clipUs, fadeInUs, fadeOutUs, gain, effects)
             val mediaItem = MediaItem.Builder()
                 .setUri(uri)
                 .setClippingConfiguration(
@@ -447,7 +608,8 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         link: String?,
         fadeInUs: Long,
         fadeOutUs: Long,
-        gain: Float
+        gain: Float,
+        effects: EffectSettings
     ) {
         val rangeStart = startMs
         val rangeEnd = endMs
@@ -465,6 +627,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
                         fadeInUs = fadeInUs,
                         fadeOutUs = fadeOutUs,
                         gain = gain,
+                        effects = effects,
                         outFile = out,
                         onProgress = { value -> progress = value },
                         cancelled = { !isActive }
@@ -506,6 +669,8 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     fun cancelExport(silent: Boolean = false) {
         if (!exporting) return
         progressJob?.cancel()
+        measureJob?.cancel()
+        measureJob = null
         try {
             transformer?.cancel()
         } catch (_: Exception) {
@@ -605,9 +770,21 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         cancelExport(silent = true)
         analysisJob?.cancel()
+        zoomJob?.cancel()
+        measureJob?.cancel()
         progressJob?.cancel()
         player?.release()
         player = null
         super.onCleared()
     }
 }
+
+/** Dữ liệu sóng phóng to quanh một điểm cắt; [marker] là vị trí điểm cắt trong cửa sổ (0..1). */
+data class ZoomView(val peaks: List<Float>, val marker: Float)
+
+private const val ZOOM_HALF_MS = 1500L
+private const val ZOOM_BARS = 72
+private const val EDGE_PREVIEW_MS = 2000L
+
+/** Đỉnh mục tiêu khi chuẩn hóa, khoảng -1 dBFS. */
+private const val NORMALIZE_TARGET = 0.89f

@@ -93,3 +93,11 @@ Logo kiểu liquid glass nằm ở `docs/logo.png` (1024×1024) và ảnh chia s
 - **WAV** — PCM 16-bit không nén (file lớn).
 
 Opus/OGG/FLAC chưa được hỗ trợ vì Android không có bộ mã hóa tích hợp sẵn cho các định dạng này.
+
+## Hiệu ứng âm thanh và chỉnh điểm cắt / Effects and precise trimming
+
+- **Equalizer 5 dải** (60 Hz – 14 kHz, ±12 dB) kèm preset (Phẳng, Bass mạnh, Giọng hát, Loa ngoài rõ) và **preamp**.
+- **Chuẩn hóa âm lượng**: đo đỉnh của đoạn đã cắt rồi đưa về khoảng −1 dBFS.
+- **Giới hạn đỉnh** (trần −0,3 dBFS) để chống rè khi tăng bass/preamp.
+- **Chỉnh mịn điểm cắt** theo bước 10 ms / 0,1 s / 1 s, sóng âm phóng to quanh điểm bắt đầu/kết thúc và nghe thử 2 giây ở mỗi đầu.
+- Hiệu ứng áp dụng cho cả M4A, MP3 và WAV khi xuất.

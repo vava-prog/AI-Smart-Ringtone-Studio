@@ -134,6 +134,7 @@ object PcmExporter {
         fadeInUs: Long,
         fadeOutUs: Long,
         gain: Float,
+        effects: EffectSettings,
         outFile: File,
         onProgress: (Float) -> Unit,
         cancelled: () -> Boolean
@@ -176,6 +177,8 @@ object PcmExporter {
             var pcmEncoding = AudioFormat.ENCODING_PCM_16BIT
 
             var scratch = ShortArray(0)
+            var chain: EffectChain? = null
+            var frameBuf = FloatArray(2)
             var clipFrame = 0L
             var inputDone = false
             var done = false
@@ -226,6 +229,11 @@ object PcmExporter {
                                 val count = lastFrame - firstFrame
                                 if (sink == null) {
                                     sink = createSink(format, outFile, sampleRate, outChannels, bitrateKbps)
+                                    chain = if (effects.isNeutral) {
+                                        null
+                                    } else {
+                                        EffectChain(sampleRate, outChannels, effects)
+                                    }
                                 }
                                 if (scratch.size < count * outChannels) {
                                     scratch = ShortArray(count * outChannels)
@@ -238,10 +246,12 @@ object PcmExporter {
                                     )
                                     for (c in 0 until inChannels) {
                                         val v = if (isFloat) buf.getFloat() else buf.getShort() / 32768f
-                                        if (c < outChannels) {
-                                            scratch[f * outChannels + c] =
-                                                (v * g * 32768f).roundToInt().coerceIn(-32768, 32767).toShort()
-                                        }
+                                        if (c < outChannels) frameBuf[c] = v * g
+                                    }
+                                    chain?.process(frameBuf)
+                                    for (c in 0 until outChannels) {
+                                        scratch[f * outChannels + c] =
+                                            (frameBuf[c] * 32768f).roundToInt().coerceIn(-32768, 32767).toShort()
                                     }
                                     clipFrame++
                                 }

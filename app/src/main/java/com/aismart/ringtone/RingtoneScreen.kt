@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -177,6 +178,33 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                         style = MaterialTheme.typography.bodySmall
                     )
 
+                    Text(stringResource(R.string.label_fine_start), style = MaterialTheme.typography.labelLarge)
+                    NudgeRow(enabled = !vm.exporting, onNudge = { vm.nudgeStart(it) })
+                    Text(stringResource(R.string.label_fine_end), style = MaterialTheme.typography.labelLarge)
+                    NudgeRow(enabled = !vm.exporting, onNudge = { vm.nudgeEnd(it) })
+
+                    FilterChip(
+                        selected = vm.zoomOn,
+                        onClick = { vm.toggleZoom(!vm.zoomOn) },
+                        label = { Text(stringResource(R.string.label_zoom)) }
+                    )
+                    if (vm.zoomOn) {
+                        Text(stringResource(R.string.label_zoom_start), style = MaterialTheme.typography.bodySmall)
+                        ZoomWave(vm.zoomStartView, insideAfterMarker = true)
+                        OutlinedButton(
+                            onClick = { vm.playEdge(true) },
+                            enabled = !vm.exporting,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(stringResource(R.string.btn_listen_start)) }
+                        Text(stringResource(R.string.label_zoom_end), style = MaterialTheme.typography.bodySmall)
+                        ZoomWave(vm.zoomEndView, insideAfterMarker = false)
+                        OutlinedButton(
+                            onClick = { vm.playEdge(false) },
+                            enabled = !vm.exporting,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(stringResource(R.string.btn_listen_end)) }
+                    }
+
                     OutlinedButton(
                         onClick = { vm.smartPick() },
                         enabled = vm.profile != null && !vm.exporting,
@@ -277,6 +305,64 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                             )
                         ),
                         style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
+            // 3b. Hiệu ứng âm thanh
+            GlassCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.section_effects), style = MaterialTheme.typography.titleMedium)
+
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        EqPreset.values().forEach { preset ->
+                            FilterChip(
+                                selected = vm.eqBands == preset.bands && vm.preampDb == preset.preampDb,
+                                onClick = { vm.selectPreset(preset) },
+                                enabled = !vm.exporting,
+                                label = { Text(stringResource(preset.labelRes)) }
+                            )
+                        }
+                    }
+
+                    Text(stringResource(R.string.label_preamp, signedDb(vm.preampDb)))
+                    Slider(
+                        value = vm.preampDb,
+                        onValueChange = { vm.changePreamp(it.roundToInt().toFloat()) },
+                        valueRange = -EqConfig.MAX_DB..EqConfig.MAX_DB,
+                        steps = 23,
+                        enabled = !vm.exporting
+                    )
+
+                    for (i in 0 until EqConfig.COUNT) {
+                        Text("${EqConfig.LABELS[i]}: ${signedDb(vm.eqBands[i])}")
+                        Slider(
+                            value = vm.eqBands[i],
+                            onValueChange = { vm.changeBand(i, it.roundToInt().toFloat()) },
+                            valueRange = -EqConfig.MAX_DB..EqConfig.MAX_DB,
+                            steps = 23,
+                            enabled = !vm.exporting
+                        )
+                    }
+
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            selected = vm.normalizeOn,
+                            onClick = { vm.toggleNormalize(!vm.normalizeOn) },
+                            enabled = !vm.exporting,
+                            label = { Text(stringResource(R.string.label_normalize)) }
+                        )
+                        FilterChip(
+                            selected = vm.limiterOn,
+                            onClick = { vm.toggleLimiter(!vm.limiterOn) },
+                            enabled = !vm.exporting,
+                            label = { Text(stringResource(R.string.label_limiter)) }
+                        )
+                    }
+                    Text(
+                        stringResource(R.string.effects_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -410,6 +496,72 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
 }
 
 private fun oneDecimal(value: Float): String = String.format(Locale.getDefault(), "%.1f", value)
+
+private fun signedDb(value: Float): String =
+    String.format(Locale.getDefault(), "%+d dB", value.roundToInt())
+
+/** Hàng nút dịch điểm cắt theo từng bước nhỏ (mili giây). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun NudgeRow(enabled: Boolean, onNudge: (Long) -> Unit) {
+    val steps = listOf(
+        "−1 s" to -1000L, "−0.1 s" to -100L, "−10 ms" to -10L,
+        "+10 ms" to 10L, "+0.1 s" to 100L, "+1 s" to 1000L
+    )
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        steps.forEach { (label, delta) ->
+            OutlinedButton(
+                onClick = { onNudge(delta) },
+                enabled = enabled,
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+            ) { Text(label) }
+        }
+    }
+}
+
+/** Sóng âm phóng to quanh một điểm cắt; vạch đứng là vị trí điểm cắt. */
+@Composable
+private fun ZoomWave(view: ZoomView?, insideAfterMarker: Boolean) {
+    val active = MaterialTheme.colorScheme.primary
+    val inactive = MaterialTheme.colorScheme.outlineVariant
+    val marker = MaterialTheme.colorScheme.tertiary
+    Canvas(
+        Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+    ) {
+        val peaks = view?.peaks.orEmpty()
+        if (view == null || peaks.isEmpty()) {
+            drawRoundRect(
+                color = inactive,
+                topLeft = Offset(0f, size.height / 2f - 2.dp.toPx()),
+                size = Size(size.width, 4.dp.toPx()),
+                cornerRadius = CornerRadius(2.dp.toPx())
+            )
+            return@Canvas
+        }
+        val slot = size.width / peaks.size
+        val barWidth = slot * 0.7f
+        peaks.forEachIndexed { index, value ->
+            val position = (index + 0.5f) / peaks.size
+            val inside = if (insideAfterMarker) position >= view.marker else position <= view.marker
+            val barHeight = (value.coerceIn(0f, 1f) * size.height).coerceAtLeast(3.dp.toPx())
+            drawRoundRect(
+                color = if (inside) active else inactive,
+                topLeft = Offset(index * slot + (slot - barWidth) / 2f, (size.height - barHeight) / 2f),
+                size = Size(barWidth, barHeight),
+                cornerRadius = CornerRadius(barWidth / 2f)
+            )
+        }
+        val x = view.marker * size.width
+        drawLine(
+            color = marker,
+            start = Offset(x, 0f),
+            end = Offset(x, size.height),
+            strokeWidth = 2.dp.toPx()
+        )
+    }
+}
 
 /** Vẽ sóng âm dạng thanh; phần nằm trong đoạn đã chọn được tô màu nổi bật. */
 @Composable

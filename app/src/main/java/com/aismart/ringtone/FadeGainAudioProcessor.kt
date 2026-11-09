@@ -17,16 +17,23 @@ class FadeGainAudioProcessor(
     private val clipDurationUs: Long,
     private val fadeInUs: Long,
     private val fadeOutUs: Long,
-    private val gain: Float
+    private val gain: Float,
+    private val effects: EffectSettings = EffectSettings()
 ) : BaseAudioProcessor() {
 
     private var frameIndex = 0L
+    private var chain: EffectChain? = null
 
     override fun onConfigure(
         inputAudioFormat: AudioProcessor.AudioFormat
     ): AudioProcessor.AudioFormat {
         if (inputAudioFormat.encoding != C.ENCODING_PCM_16BIT) {
             throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)
+        }
+        chain = if (effects.isNeutral) {
+            null
+        } else {
+            EffectChain(inputAudioFormat.sampleRate, inputAudioFormat.channelCount, effects)
         }
         return inputAudioFormat
     }
@@ -41,13 +48,18 @@ class FadeGainAudioProcessor(
         inputBuffer.order(ByteOrder.nativeOrder())
 
         val frameBytes = 2 * channels
+        val frame = FloatArray(channels)
+        val activeChain = chain
         while (inputBuffer.remaining() >= frameBytes) {
             val g = RingtoneMath.gainAt(
                 frameIndex, sampleRate, clipDurationUs, fadeInUs, fadeOutUs, gain
             )
             for (c in 0 until channels) {
-                val sample = inputBuffer.getShort().toInt()
-                val scaled = (sample * g).roundToInt()
+                frame[c] = inputBuffer.getShort() / 32768f * g
+            }
+            activeChain?.process(frame)
+            for (c in 0 until channels) {
+                val scaled = (frame[c] * 32768f).roundToInt()
                     .coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
                 output.putShort(scaled.toShort())
             }

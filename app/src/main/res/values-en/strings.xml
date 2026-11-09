@@ -127,4 +127,22 @@
     <string name="format_hint_wav">WAV is uncompressed, so files are large (about 10 MB per minute); long ringtones get heavy.</string>
     <string name="msg_mp3_rate_unsupported">Cannot export MP3 because the source is %1$d Hz. Choose M4A or WAV.</string>
     <string name="msg_no_audio">Could not read any audio in the selected range.</string>
+
+    <string name="section_effects">Audio effects</string>
+    <string name="preset_flat">Flat</string>
+    <string name="preset_bass">Bass boost</string>
+    <string name="preset_vocal">Vocal</string>
+    <string name="preset_speaker">Speaker clarity</string>
+    <string name="label_preamp">Preamp: %1$s</string>
+    <string name="label_normalize">Normalize volume</string>
+    <string name="label_limiter">Peak limiter (anti-clipping)</string>
+    <string name="effects_hint">Effects are applied when you export. Tap “Preview result” to check them. Keep the limiter on when boosting bass or preamp.</string>
+    <string name="msg_measuring">Measuring volume level…</string>
+    <string name="label_fine_start">Fine-tune start point</string>
+    <string name="label_fine_end">Fine-tune end point</string>
+    <string name="label_zoom">Zoom cut points</string>
+    <string name="label_zoom_start">Around the start point</string>
+    <string name="label_zoom_end">Around the end point</string>
+    <string name="btn_listen_start">▶ Play first 2 s of the clip</string>
+    <string name="btn_listen_end">▶ Play last 2 s of the clip</string>
 </resources>
