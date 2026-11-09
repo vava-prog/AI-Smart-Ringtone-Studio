@@ -90,6 +90,8 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
         Text(stringResource(R.string.title_home), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(R.string.subtitle), style = MaterialTheme.typography.bodyMedium)
 
+        AgentCard(vm)
+
         // Link YouTube / TikTok (tùy chọn): chỉ để mở lại video và ghi nguồn
         GlassCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

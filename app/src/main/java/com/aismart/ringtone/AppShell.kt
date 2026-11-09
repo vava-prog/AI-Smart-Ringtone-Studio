@@ -84,6 +84,9 @@ fun RingtoneApp(vm: RingtoneViewModel) {
     RingtoneTheme(dark) {
         var tab by rememberSaveable { mutableStateOf(TAB_DASHBOARD) }
         BackHandler(enabled = tab != TAB_DASHBOARD) { tab = TAB_DASHBOARD }
+        LaunchedEffect(vm.openDiscoverTick) {
+            if (vm.openDiscoverTick > 0) tab = TAB_DISCOVER
+        }
         LaunchedEffect(vm.openCreateTick) {
             if (vm.openCreateTick > 0) tab = TAB_CREATE
         }

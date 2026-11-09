@@ -177,4 +177,32 @@
     <string name="jamendo_title">Jamendo (tùy chọn)</string>
     <string name="jamendo_label">client_id</string>
     <string name="jamendo_note">Đăng ký miễn phí tại developer.jamendo.com rồi dán client_id để bật nguồn Jamendo trong mục Khám phá.</string>
+
+    <string name="agent_title">Trợ lý AI (chạy trên máy)</string>
+    <string name="agent_note">Gõ lệnh tiếng Việt hoặc tiếng Anh đơn giản, trợ lý sẽ chỉnh các tùy chọn giúp bạn. Mọi xử lý diễn ra trên máy, không gửi dữ liệu lên mạng.</string>
+    <string name="agent_hint">Ví dụ: chọn điệp khúc 30 giây, bass mạnh, xuất mp3</string>
+    <string name="btn_agent_run">Thực hiện</string>
+    <string name="agent_ex1">Chọn điệp khúc 30 giây, bass mạnh, xuất mp3</string>
+    <string name="agent_ex2">Từ 0:45 đến 1:15, fade out 3 giây</string>
+    <string name="agent_ex3">Chuẩn hóa âm lượng và chống rè</string>
+    <string name="agent_ex4">Tìm nhạc piano nhẹ nhàng</string>
+    <string name="agent_unknown">Mình chưa hiểu lệnh này. Hãy thử một trong các ví dụ bên dưới.</string>
+    <string name="agent_need_source">Cần chọn file nhạc trước (bước 1) để thực hiện các lệnh về đoạn cắt và xuất file.</string>
+    <string name="agent_no_analysis">Chưa có dữ liệu phân tích nên chưa gợi ý được đoạn hay nhất.</string>
+    <string name="agent_set_length">Đã đặt độ dài đoạn: %1$s</string>
+    <string name="agent_set_range">Đã chọn đoạn %1$s – %2$s</string>
+    <string name="agent_smart_done">Đã chọn đoạn hay nhất %1$s – %2$s</string>
+    <string name="agent_fade_in">Fade in: %1$s giây</string>
+    <string name="agent_fade_out">Fade out: %1$s giây</string>
+    <string name="agent_volume">Âm lượng: %1$d%%</string>
+    <string name="agent_format">Định dạng đầu ra: %1$s</string>
+    <string name="agent_bitrate">Chất lượng: %1$d kbps</string>
+    <string name="agent_preset">Equalizer: %1$s</string>
+    <string name="agent_normalize_on">Đã bật chuẩn hóa âm lượng</string>
+    <string name="agent_normalize_off">Đã tắt chuẩn hóa âm lượng</string>
+    <string name="agent_limiter_on">Đã bật giới hạn đỉnh</string>
+    <string name="agent_limiter_off">Đã tắt giới hạn đỉnh</string>
+    <string name="agent_target">Dùng làm: %1$s</string>
+    <string name="agent_search">Đang tìm “%1$s” trong mục Khám phá</string>
+    <string name="agent_export">Đã bắt đầu xuất file</string>
 </resources>

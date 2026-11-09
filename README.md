@@ -105,3 +105,7 @@ Opus/OGG/FLAC chưa được hỗ trợ vì Android không có bộ mã hóa tí
 ## Khám phá nhạc / Music discovery
 
 Tab **Khám phá** tìm nhạc có giấy phép mở (Openverse, Internet Archive, Jamendo nếu có client_id), nghe thử, tải về và đưa vào tab Tạo mới kèm thông tin tác giả/giấy phép. Chỉ hiện nhạc cho phép chỉnh sửa (loại giấy phép ND). Mục "Bài đang được nghe nhiều" lấy từ bảng xếp hạng Deezer chỉ để tham khảo xu hướng, không có âm thanh. Ứng dụng **không** tải nhạc từ YouTube/TikTok. Đây là phần duy nhất dùng Internet (quyền `INTERNET`).
+
+## Trợ lý AI chạy trên máy / On-device assistant
+
+Ô "Trợ lý AI" ở đầu tab Tạo mới hiểu lệnh tiếng Việt/Anh đơn giản bằng luật và từ khóa (không cần Internet, không cần khóa API), ví dụ: `Chọn điệp khúc 30 giây, bass mạnh, xuất mp3`, `Từ 0:45 đến 1:15, fade out 3 giây`, `Chuẩn hóa âm lượng và chống rè`, `Tìm nhạc piano nhẹ nhàng`.

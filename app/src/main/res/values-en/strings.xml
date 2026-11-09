@@ -177,4 +177,32 @@
     <string name="jamendo_title">Jamendo (optional)</string>
     <string name="jamendo_label">client_id</string>
     <string name="jamendo_note">Register for free at developer.jamendo.com and paste your client_id to enable Jamendo in Discover.</string>
+
+    <string name="agent_title">AI assistant (runs on your device)</string>
+    <string name="agent_note">Type a simple command in Vietnamese or English and the assistant adjusts the options for you. Everything runs on your device, no data is sent online.</string>
+    <string name="agent_hint">Example: pick the chorus, 30 seconds, bass boost, export mp3</string>
+    <string name="btn_agent_run">Run</string>
+    <string name="agent_ex1">Pick the chorus, 30 seconds, bass boost, export mp3</string>
+    <string name="agent_ex2">From 0:45 to 1:15, fade out 3 seconds</string>
+    <string name="agent_ex3">Normalize volume and anti-clipping</string>
+    <string name="agent_ex4">Find music soft piano</string>
+    <string name="agent_unknown">I did not understand that command. Try one of the examples below.</string>
+    <string name="agent_need_source">Pick a music file first (step 1) to run commands about the clip and export.</string>
+    <string name="agent_no_analysis">No analysis data yet, so I cannot suggest the best part.</string>
+    <string name="agent_set_length">Clip length set: %1$s</string>
+    <string name="agent_set_range">Selected %1$s – %2$s</string>
+    <string name="agent_smart_done">Picked the best part %1$s – %2$s</string>
+    <string name="agent_fade_in">Fade in: %1$s s</string>
+    <string name="agent_fade_out">Fade out: %1$s s</string>
+    <string name="agent_volume">Volume: %1$d%%</string>
+    <string name="agent_format">Output format: %1$s</string>
+    <string name="agent_bitrate">Quality: %1$d kbps</string>
+    <string name="agent_preset">Equalizer: %1$s</string>
+    <string name="agent_normalize_on">Volume normalization on</string>
+    <string name="agent_normalize_off">Volume normalization off</string>
+    <string name="agent_limiter_on">Peak limiter on</string>
+    <string name="agent_limiter_off">Peak limiter off</string>
+    <string name="agent_target">Use as: %1$s</string>
+    <string name="agent_search">Searching “%1$s” in Discover</string>
+    <string name="agent_export">Export started</string>
 </resources>

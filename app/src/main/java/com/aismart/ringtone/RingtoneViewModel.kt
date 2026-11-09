@@ -117,6 +117,14 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     var zoomEndView by mutableStateOf<ZoomView?>(null)
         private set
 
+    /** Kết quả của lần chạy lệnh trợ lý gần nhất. */
+    var agentLog by mutableStateOf<List<Msg>>(emptyList())
+        private set
+
+    /** Tăng lên khi trợ lý muốn mở tab Khám phá. */
+    var openDiscoverTick by mutableIntStateOf(0)
+        private set
+
     var jamendoClientId by mutableStateOf(settings.jamendoClientId)
         private set
 
@@ -313,7 +321,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun smartPick() {
+    fun smartPick(kind: PickKind? = null) {
         val data = analysisData ?: return
         if (!hasSource) return
         val length = (if (clipMs >= RingtoneMath.MIN_CLIP_MS) clipMs else RingtoneMath.DEFAULT_CLIP_MS)
@@ -321,7 +329,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         val candidates = SmartPicker.pick(data, length, durationMs)
         if (candidates.isEmpty()) return
         pickCandidates = candidates
-        applyCandidate(candidates[0])
+        applyCandidate(kind?.let { k -> candidates.firstOrNull { it.kind == k } } ?: candidates[0])
         message = Msg(R.string.msg_smart_done)
     }
 
@@ -356,6 +364,103 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         format = newFormat
         onSettingsChanged()
     }
+
+    /** Trợ lý chạy trên máy: hiểu lệnh đơn giản và điều khiển các chức năng của ứng dụng. */
+    fun runAgent(text: String) {
+        val actions = AgentParser.parse(text)
+        if (actions.isEmpty()) {
+            agentLog = listOf(Msg(R.string.agent_unknown))
+            return
+        }
+        val log = ArrayList<Msg>()
+        var needSource = false
+        for (action in actions) {
+            when (action) {
+                is AgentAction.SetLength -> if (hasSource) {
+                    setRange(startMs, startMs + action.ms)
+                    log.add(Msg(R.string.agent_set_length, RingtoneMath.formatTime(clipMs)))
+                } else needSource = true
+                is AgentAction.SetStart -> if (hasSource) {
+                    setRange(action.ms, action.ms + clipMs)
+                    log.add(Msg(R.string.agent_set_range, RingtoneMath.formatTime(startMs), RingtoneMath.formatTime(endMs)))
+                } else needSource = true
+                is AgentAction.SetRange -> if (hasSource) {
+                    setRange(action.startMs, action.endMs)
+                    log.add(Msg(R.string.agent_set_range, RingtoneMath.formatTime(startMs), RingtoneMath.formatTime(endMs)))
+                } else needSource = true
+                is AgentAction.Smart -> if (!hasSource) {
+                    needSource = true
+                } else if (analysisData == null) {
+                    log.add(Msg(R.string.agent_no_analysis))
+                } else {
+                    smartPick(action.kind)
+                    log.add(Msg(R.string.agent_smart_done, RingtoneMath.formatTime(startMs), RingtoneMath.formatTime(endMs)))
+                }
+                is AgentAction.FadeIn -> {
+                    setFadeIn(action.seconds)
+                    log.add(Msg(R.string.agent_fade_in, oneDecimal(action.seconds)))
+                }
+                is AgentAction.FadeOut -> {
+                    setFadeOut(action.seconds)
+                    log.add(Msg(R.string.agent_fade_out, oneDecimal(action.seconds)))
+                }
+                is AgentAction.VolumeSet -> {
+                    setVolume(action.percent)
+                    log.add(Msg(R.string.agent_volume, action.percent))
+                }
+                is AgentAction.VolumeAdjust -> {
+                    setVolume((volumePercent + action.delta).coerceIn(50, 150))
+                    log.add(Msg(R.string.agent_volume, volumePercent))
+                }
+                is AgentAction.Format -> {
+                    selectFormat(action.format)
+                    log.add(Msg(R.string.agent_format, app.getString(action.format.labelRes)))
+                }
+                is AgentAction.Bitrate -> {
+                    setBitrate(action.kbps)
+                    log.add(Msg(R.string.agent_bitrate, action.kbps))
+                }
+                is AgentAction.Preset -> {
+                    selectPreset(action.preset)
+                    log.add(Msg(R.string.agent_preset, app.getString(action.preset.labelRes)))
+                }
+                is AgentAction.Normalize -> {
+                    toggleNormalize(action.on)
+                    log.add(Msg(if (action.on) R.string.agent_normalize_on else R.string.agent_normalize_off))
+                }
+                is AgentAction.Limiter -> {
+                    toggleLimiter(action.on)
+                    log.add(Msg(if (action.on) R.string.agent_limiter_on else R.string.agent_limiter_off))
+                }
+                is AgentAction.Target -> {
+                    val chosen = when (action.target) {
+                        AgentTarget.RINGTONE -> RingtoneTarget.RINGTONE
+                        AgentTarget.NOTIFICATION -> RingtoneTarget.NOTIFICATION
+                        AgentTarget.ALARM -> RingtoneTarget.ALARM
+                    }
+                    selectTarget(chosen)
+                    log.add(Msg(R.string.agent_target, app.getString(chosen.labelRes)))
+                }
+                is AgentAction.Search -> {
+                    discover.updateQuery(action.query)
+                    discover.chooseSource(OnlineSource.OPENVERSE)
+                    discover.search()
+                    openDiscoverTick++
+                    log.add(Msg(R.string.agent_search, action.query))
+                }
+                AgentAction.Export -> if (!hasSource) {
+                    needSource = true
+                } else if (!exporting) {
+                    export()
+                    log.add(Msg(R.string.agent_export))
+                }
+            }
+        }
+        if (needSource) log.add(Msg(R.string.agent_need_source))
+        agentLog = log
+    }
+
+    private fun oneDecimal(value: Float): String = String.format(java.util.Locale.getDefault(), "%.1f", value)
 
     fun updateJamendoId(text: String) {
         jamendoClientId = text.trim()
