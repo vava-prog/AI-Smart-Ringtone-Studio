@@ -93,9 +93,11 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
         AgentCard(vm)
 
         // Link YouTube / TikTok (tùy chọn): chỉ để mở lại video và ghi nguồn
-        GlassCard(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(R.string.section_link), style = MaterialTheme.typography.titleMedium)
+        CollapsibleGlassCard(stringResource(R.string.section_link), Modifier.fillMaxWidth()) {
+            Column(
+                Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 val link = SourceLinks.parse(vm.sourceLink)
                 OutlinedTextField(
                     value = vm.sourceLink,
@@ -349,9 +351,11 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
             }
 
             // 3b. Hiệu ứng âm thanh
-            GlassCard(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(stringResource(R.string.section_effects), style = MaterialTheme.typography.titleMedium)
+            CollapsibleGlassCard(stringResource(R.string.section_effects), Modifier.fillMaxWidth()) {
+                Column(
+                    Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
 
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         EqPreset.values().forEach { preset ->
@@ -511,9 +515,11 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
         }
 
         // Nguồn nhạc miễn phí bản quyền
-        GlassCard(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(stringResource(R.string.section_sources), style = MaterialTheme.typography.titleMedium)
+        CollapsibleGlassCard(stringResource(R.string.section_sources), Modifier.fillMaxWidth()) {
+            Column(
+                Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(stringResource(R.string.sources_note), style = MaterialTheme.typography.bodySmall)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     TextButton(onClick = { openUrl("https://pixabay.com/music/") }) {

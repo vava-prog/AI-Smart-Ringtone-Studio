@@ -212,4 +212,7 @@
     <string name="preset_name_label">New preset name</string>
     <string name="btn_save_preset">Save current EQ as a preset</string>
     <string name="btn_delete_preset">Delete preset “%1$s”</string>
+
+    <string name="format_title">By format</string>
+    <string name="btn_discover_music">Discover openly licensed music</string>
 </resources>

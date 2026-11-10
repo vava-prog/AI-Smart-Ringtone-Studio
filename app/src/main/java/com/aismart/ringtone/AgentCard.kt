@@ -35,9 +35,11 @@ fun AgentCard(vm: RingtoneViewModel) {
         stringResource(R.string.agent_ex4)
     )
 
-    GlassCard(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.agent_title), style = MaterialTheme.typography.titleMedium)
+    CollapsibleGlassCard(stringResource(R.string.agent_title), Modifier.fillMaxWidth(), initiallyExpanded = true) {
+        Column(
+            Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Text(
                 stringResource(R.string.agent_note),
                 style = MaterialTheme.typography.bodySmall,

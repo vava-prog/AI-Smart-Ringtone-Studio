@@ -212,4 +212,7 @@
     <string name="preset_name_label">Tên preset mới</string>
     <string name="btn_save_preset">Lưu cài đặt EQ hiện tại thành preset</string>
     <string name="btn_delete_preset">Xóa preset “%1$s”</string>
+
+    <string name="format_title">Theo định dạng</string>
+    <string name="btn_discover_music">Khám phá nhạc có giấy phép mở</string>
 </resources>

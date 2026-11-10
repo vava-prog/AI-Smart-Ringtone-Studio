@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,6 +44,7 @@ fun DashboardScreen(
     vm: RingtoneViewModel,
     onCreate: () -> Unit,
     onOpenHistory: () -> Unit,
+    onOpenDiscover: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val entries = vm.historyEntries
@@ -111,6 +113,23 @@ fun DashboardScreen(
 
         GlassCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.format_title), style = MaterialTheme.typography.titleMedium)
+                OutputFormat.values().forEach { option ->
+                    val count = entries.count { it.format == option }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(option.ext.uppercase(), Modifier.width(84.dp))
+                        LinearProgressIndicator(
+                            progress = { if (total == 0) 0f else count.toFloat() / total },
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text("$count", Modifier.width(36.dp), textAlign = TextAlign.End)
+                    }
+                }
+            }
+        }
+
+        GlassCard(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(stringResource(R.string.bitrate_title), style = MaterialTheme.typography.titleMedium)
                 listOf(64, 96, 128, 192).forEach { kbps ->
                     val count = entries.count { it.bitrateKbps == kbps }
@@ -161,6 +180,9 @@ fun DashboardScreen(
 
         Button(onClick = onCreate, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.btn_create_new))
+        }
+        OutlinedButton(onClick = onOpenDiscover, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.btn_discover_music))
         }
     }
 }

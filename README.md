@@ -117,3 +117,7 @@ Tab **Khám phá** tìm nhạc có giấy phép mở (Openverse, Internet Archiv
 - **Đường cong EQ** trực quan, **preset tự lưu** (đặt tên, áp dụng, xóa).
 - **Nghe thử đoạn có hiệu ứng ngay** (EQ, preamp, giới hạn đỉnh, âm lượng).
 - OGG/Opus chưa có vì Android không có bộ mã hóa tích hợp và chưa có bản Java gọn, đã kiểm chứng.
+
+## Tải APK
+
+Bản build mới nhất nằm ở mục **Releases → Debug APK (bản build mới nhất)** (tự cập nhật sau mỗi lần push vào `main`). Đây là bản debug để thử nghiệm; bản phát hành ký số dùng workflow `release-apk.yml`.

@@ -124,6 +124,7 @@ fun RingtoneApp(vm: RingtoneViewModel) {
                         vm = vm,
                         onCreate = { tab = TAB_CREATE },
                         onOpenHistory = { tab = TAB_HISTORY },
+                        onOpenDiscover = { tab = TAB_DISCOVER },
                         modifier = content
                     )
                     TAB_CREATE -> CreateScreen(vm, content)

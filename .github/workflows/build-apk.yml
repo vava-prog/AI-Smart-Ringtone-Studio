@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout source
@@ -64,6 +66,21 @@ jobs:
           name: Smart-Ringtone-Studio-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      # Đăng APK lên mục Releases để tải thẳng về điện thoại (bản debug, dùng để thử nghiệm)
+      - name: Publish debug APK to pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          apk=$(ls app/build/outputs/apk/debug/*.apk | head -n 1)
+          cp "$apk" Smart-Ringtone-Studio-debug.apk
+          gh release delete latest-debug --yes --cleanup-tag || true
+          gh release create latest-debug Smart-Ringtone-Studio-debug.apk \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Debug APK (bản build mới nhất)" \
+            --notes "Tự động build từ commit $GITHUB_SHA. Bản debug dùng để thử nghiệm."
 
   # Job riêng để lỗi unit test không chặn việc tạo APK
   test:
