@@ -119,6 +119,11 @@ class HistoryStore(context: Context) {
 class SettingsStore(context: Context) {
     private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
+    /** Preset equalizer do người dùng lưu (JSON). */
+    var customPresetsJson: String
+        get() = prefs.getString("custom_presets", "") ?: ""
+        set(value) = prefs.edit().putString("custom_presets", value).apply()
+
     /** client_id Jamendo do người dùng tự đăng ký (tùy chọn). */
     var jamendoClientId: String
         get() = prefs.getString("jamendo_client_id", "") ?: ""

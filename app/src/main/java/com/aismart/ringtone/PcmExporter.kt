@@ -103,6 +103,47 @@ object PcmExporter {
         }
     }
 
+    private class FlacSink(file: File, sampleRate: Int, channels: Int) : PcmSink {
+        private val encoder = FlacEncoder(RandomAccessFile(file, "rw"), sampleRate, channels)
+
+        override fun write(pcm: ShortArray, frames: Int) {
+            encoder.encode(pcm, frames)
+        }
+
+        override fun finish() {
+            encoder.finish()
+        }
+
+        override fun abort() {
+            encoder.abort()
+        }
+    }
+
+    /** Đổi tần số lấy mẫu trước khi chuyển PCM cho bộ mã hóa phía sau. */
+    private class ResamplingSink(
+        private val inner: PcmSink,
+        inRate: Int,
+        outRate: Int,
+        private val channels: Int
+    ) : PcmSink {
+        private val resampler = Resampler(inRate, outRate, channels)
+
+        override fun write(pcm: ShortArray, frames: Int) {
+            val out = resampler.process(pcm, frames)
+            if (out.isNotEmpty()) inner.write(out, out.size / channels)
+        }
+
+        override fun finish() {
+            val tail = resampler.flush()
+            if (tail.isNotEmpty()) inner.write(tail, tail.size / channels)
+            inner.finish()
+        }
+
+        override fun abort() {
+            inner.abort()
+        }
+    }
+
     private fun createSink(
         format: OutputFormat,
         file: File,
@@ -111,11 +152,11 @@ object PcmExporter {
         bitrateKbps: Int
     ): PcmSink = when (format) {
         OutputFormat.WAV -> WavSink(file, sampleRate, channels)
+        OutputFormat.FLAC -> FlacSink(file, sampleRate, channels)
         OutputFormat.MP3 -> {
-            if (!Mp3Encoder.isSupportedSampleRate(sampleRate)) {
-                throw UnsupportedSampleRateException(sampleRate)
-            }
-            Mp3Sink(file, sampleRate, channels, bitrateKbps)
+            val target = Mp3Rates.target(sampleRate)
+            val mp3 = Mp3Sink(file, target, channels, bitrateKbps)
+            if (target == sampleRate) mp3 else ResamplingSink(mp3, sampleRate, target, channels)
         }
         OutputFormat.M4A -> throw IllegalArgumentException("M4A is exported with Transformer")
     }

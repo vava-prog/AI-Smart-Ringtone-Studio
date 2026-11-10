@@ -17,7 +17,11 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.audio.AudioProcessor
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.transformer.AudioEncoderSettings
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.DefaultEncoderFactory
@@ -104,6 +108,8 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         private set
     var eqBands by mutableStateOf(EqPreset.FLAT.bands)
         private set
+    var customPresets by mutableStateOf(CustomPresets.parse(settings.customPresetsJson))
+        private set
     var normalizeOn by mutableStateOf(false)
         private set
     var limiterOn by mutableStateOf(false)
@@ -158,6 +164,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         private set
 
     // ---- Nội bộ ----
+    private val previewProcessor = PreviewEffectsAudioProcessor()
     private var analysisJob: Job? = null
     private var analysisData: TrackAnalysis? = null
     private var progressJob: Job? = null
@@ -498,6 +505,24 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun saveCustomPreset(rawName: String) {
+        val name = CustomPresets.cleanName(rawName)
+        if (name.isEmpty()) return
+        customPresets = CustomPresets.upsert(customPresets, CustomPreset(name, preampDb, eqBands))
+        settings.customPresetsJson = CustomPresets.toJson(customPresets)
+    }
+
+    fun applyCustomPreset(preset: CustomPreset) {
+        preampDb = preset.preampDb
+        eqBands = preset.bands
+        onSettingsChanged()
+    }
+
+    fun deleteCustomPreset(preset: CustomPreset) {
+        customPresets = customPresets.filterNot { it.name == preset.name }
+        settings.customPresetsJson = CustomPresets.toJson(customPresets)
+    }
+
     fun selectPreset(preset: EqPreset) {
         preampDb = preset.preampDb
         eqBands = preset.bands
@@ -532,6 +557,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
     /** Đổi bất kỳ thiết lập nào thì kết quả cũ không còn khớp nữa. */
     private fun onSettingsChanged() {
+        syncPreview()
         if (outputFile != null && !exporting) {
             if (playing == PlayKind.RESULT) stopPlayback()
             outputFile = null
@@ -539,9 +565,30 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     // ---- Nghe thử ----
+    /** Đẩy cấu hình hiệu ứng hiện tại vào bộ xử lý nghe thử. */
+    private fun syncPreview() {
+        previewProcessor.update(
+            EffectSettings(preampDb, eqBands, 1f, limiterOn),
+            volumePercent / 100f
+        )
+    }
+
     private fun ensurePlayer(): ExoPlayer {
         player?.let { return it }
-        val created = ExoPlayer.Builder(app).build()
+        val renderers = object : DefaultRenderersFactory(app) {
+            override fun buildAudioSink(
+                context: android.content.Context,
+                enableFloatOutput: Boolean,
+                enableAudioTrackPlaybackParams: Boolean
+            ): AudioSink {
+                return DefaultAudioSink.Builder(context)
+                    .setEnableFloatOutput(enableFloatOutput)
+                    .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                    .setAudioProcessors(arrayOf<AudioProcessor>(previewProcessor))
+                    .build()
+            }
+        }
+        val created = ExoPlayer.Builder(app, renderers).build()
         created.setAudioAttributes(AudioAttributes.DEFAULT, true)
         created.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -597,6 +644,9 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
     private fun play(item: MediaItem, kind: PlayKind?, historyId: String? = null) {
         val p = ensurePlayer()
+        // Chỉ nghe thử đoạn gốc mới áp dụng hiệu ứng trực tiếp
+        previewProcessor.enabled = kind == PlayKind.RANGE
+        syncPreview()
         p.setMediaItem(item)
         p.prepare()
         p.playWhenReady = true

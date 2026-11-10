@@ -123,7 +123,7 @@
     <string name="format_m4a">M4A (AAC)</string>
     <string name="format_mp3">MP3</string>
     <string name="format_wav">WAV (không nén)</string>
-    <string name="format_hint_mp3">MP3 hỗ trợ tần số lấy mẫu 8–48 kHz. Nếu file gốc có tần số khác, hãy dùng M4A hoặc WAV.</string>
+    <string name="format_hint_mp3">MP3 chỉ hỗ trợ một số tần số lấy mẫu (tối đa 48 kHz). Nếu file gốc khác, app sẽ tự đổi sang tần số gần nhất.</string>
     <string name="format_hint_wav">WAV không nén nên file lớn (khoảng 10 MB mỗi phút), nhạc chuông dài sẽ khá nặng.</string>
     <string name="msg_mp3_rate_unsupported">Không xuất được MP3 vì file gốc có tần số %1$d Hz. Hãy chọn M4A hoặc WAV.</string>
     <string name="msg_no_audio">Không đọc được âm thanh trong đoạn đã chọn.</string>
@@ -136,7 +136,7 @@
     <string name="label_preamp">Preamp: %1$s</string>
     <string name="label_normalize">Chuẩn hóa âm lượng</string>
     <string name="label_limiter">Giới hạn đỉnh (chống rè)</string>
-    <string name="effects_hint">Hiệu ứng chỉ áp dụng khi xuất file. Hãy bấm “Nghe thử kết quả” để kiểm tra. Nên bật giới hạn đỉnh khi tăng bass hoặc preamp.</string>
+    <string name="effects_hint">“Nghe thử đoạn” áp dụng ngay equalizer, preamp, giới hạn đỉnh và âm lượng (chưa gồm chuẩn hóa và fade). Bấm “Nghe thử kết quả” sau khi xuất để nghe bản hoàn chỉnh. Nên bật giới hạn đỉnh khi tăng bass hoặc preamp.</string>
     <string name="msg_measuring">Đang đo mức âm lượng…</string>
     <string name="label_fine_start">Chỉnh mịn điểm bắt đầu</string>
     <string name="label_fine_end">Chỉnh mịn điểm kết thúc</string>
@@ -205,4 +205,11 @@
     <string name="agent_target">Dùng làm: %1$s</string>
     <string name="agent_search">Đang tìm “%1$s” trong mục Khám phá</string>
     <string name="agent_export">Đã bắt đầu xuất file</string>
+
+    <string name="format_flac">FLAC (không mất dữ liệu)</string>
+    <string name="format_hint_flac">FLAC nén không mất dữ liệu nên nhỏ hơn WAV nhưng vẫn lớn hơn MP3/M4A. Một số máy cũ có thể không dùng được FLAC làm nhạc chuông.</string>
+    <string name="custom_presets_title">Preset của bạn</string>
+    <string name="preset_name_label">Tên preset mới</string>
+    <string name="btn_save_preset">Lưu cài đặt EQ hiện tại thành preset</string>
+    <string name="btn_delete_preset">Xóa preset “%1$s”</string>
 </resources>

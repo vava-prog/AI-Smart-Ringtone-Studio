@@ -5,6 +5,7 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.exp
+import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -100,22 +101,19 @@ class EffectChain(sampleRate: Int, private val channels: Int, settings: EffectSe
             val result = ArrayList<Biquad>()
             for (i in 0 until EqConfig.COUNT) {
                 val gain = gainsDb.getOrElse(i) { 0f }
-                val freq = EqConfig.FREQS[i].toDouble()
-                if (gain == 0f || freq >= 0.45 * sampleRate) continue
-                val kind = when (i) {
-                    0 -> Kind.LOW_SHELF
-                    EqConfig.COUNT - 1 -> Kind.HIGH_SHELF
-                    else -> Kind.PEAKING
-                }
-                result.add(design(kind, sampleRate.toDouble(), freq, gain.toDouble(), channels))
+                if (gain == 0f || EqConfig.FREQS[i] >= 0.45 * sampleRate) continue
+                val c = coefficients(i, gain.toDouble(), sampleRate.toDouble())
+                result.add(Biquad(c[0], c[1], c[2], c[3], c[4], channels))
             }
             return result
         }
 
-        private enum class Kind { LOW_SHELF, PEAKING, HIGH_SHELF }
-
-        /** Công thức Audio EQ Cookbook (RBJ). */
-        private fun design(kind: Kind, fs: Double, f0: Double, gainDb: Double, channels: Int): Biquad {
+        /**
+         * Hệ số biquad đã chuẩn hóa [b0, b1, b2, a1, a2] của dải [band] (0 = low shelf,
+         * cuối = high shelf, còn lại = peaking Q=1), theo Audio EQ Cookbook (RBJ).
+         */
+        fun coefficients(band: Int, gainDb: Double, fs: Double): DoubleArray {
+            val f0 = EqConfig.FREQS[band].toDouble()
             val a = 10.0.pow(gainDb / 40.0)
             val w0 = 2.0 * PI * f0 / fs
             val cosW = cos(w0)
@@ -126,17 +124,8 @@ class EffectChain(sampleRate: Int, private val channels: Int, settings: EffectSe
             val a0: Double
             val a1: Double
             val a2: Double
-            when (kind) {
-                Kind.PEAKING -> {
-                    val alpha = sinW / (2.0 * 1.0)
-                    b0 = 1.0 + alpha * a
-                    b1 = -2.0 * cosW
-                    b2 = 1.0 - alpha * a
-                    a0 = 1.0 + alpha / a
-                    a1 = -2.0 * cosW
-                    a2 = 1.0 - alpha / a
-                }
-                Kind.LOW_SHELF -> {
+            when (band) {
+                0 -> {
                     val alpha = sinW / 2.0 * sqrt(2.0)
                     val beta = 2.0 * sqrt(a) * alpha
                     b0 = a * ((a + 1) - (a - 1) * cosW + beta)
@@ -146,7 +135,7 @@ class EffectChain(sampleRate: Int, private val channels: Int, settings: EffectSe
                     a1 = -2.0 * ((a - 1) + (a + 1) * cosW)
                     a2 = (a + 1) + (a - 1) * cosW - beta
                 }
-                Kind.HIGH_SHELF -> {
+                EqConfig.COUNT - 1 -> {
                     val alpha = sinW / 2.0 * sqrt(2.0)
                     val beta = 2.0 * sqrt(a) * alpha
                     b0 = a * ((a + 1) + (a - 1) * cosW + beta)
@@ -156,8 +145,36 @@ class EffectChain(sampleRate: Int, private val channels: Int, settings: EffectSe
                     a1 = 2.0 * ((a - 1) - (a + 1) * cosW)
                     a2 = (a + 1) - (a - 1) * cosW - beta
                 }
+                else -> {
+                    val alpha = sinW / 2.0
+                    b0 = 1.0 + alpha * a
+                    b1 = -2.0 * cosW
+                    b2 = 1.0 - alpha * a
+                    a0 = 1.0 + alpha / a
+                    a1 = -2.0 * cosW
+                    a2 = 1.0 - alpha / a
+                }
             }
-            return Biquad(b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0, channels)
+            return doubleArrayOf(b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0)
         }
+    }
+}
+
+/** Đáp ứng tần số (dB) của chuỗi equalizer, dùng để vẽ đường cong. */
+object EqResponse {
+    fun gainDb(freqHz: Double, preampDb: Float, bandGainsDb: List<Float>, sampleRate: Double = 44100.0): Double {
+        var total = preampDb.toDouble()
+        val w = 2.0 * PI * freqHz / sampleRate
+        for (i in 0 until EqConfig.COUNT) {
+            val g = bandGainsDb.getOrElse(i) { 0f }
+            if (g == 0f) continue
+            val c = EffectChain.coefficients(i, g.toDouble(), sampleRate)
+            val nr = c[0] + c[1] * cos(w) + c[2] * cos(2 * w)
+            val ni = -(c[1] * sin(w) + c[2] * sin(2 * w))
+            val dr = 1.0 + c[3] * cos(w) + c[4] * cos(2 * w)
+            val di = -(c[3] * sin(w) + c[4] * sin(2 * w))
+            total += 10.0 * log10((nr * nr + ni * ni) / (dr * dr + di * di))
+        }
+        return total
     }
 }

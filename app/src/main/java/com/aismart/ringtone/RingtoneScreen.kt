@@ -310,6 +310,11 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        OutputFormat.FLAC -> Text(
+                            stringResource(R.string.format_hint_flac),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         OutputFormat.WAV -> Text(
                             stringResource(R.string.format_hint_wav),
                             style = MaterialTheme.typography.bodySmall,
@@ -358,6 +363,9 @@ fun CreateScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                             )
                         }
                     }
+
+                    CustomPresetBar(vm)
+                    EqCurve(vm.preampDb, vm.eqBands)
 
                     Text(stringResource(R.string.label_preamp, signedDb(vm.preampDb)))
                     Slider(

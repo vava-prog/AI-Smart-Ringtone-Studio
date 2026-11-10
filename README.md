@@ -109,3 +109,11 @@ Tab **Khám phá** tìm nhạc có giấy phép mở (Openverse, Internet Archiv
 ## Trợ lý AI chạy trên máy / On-device assistant
 
 Ô "Trợ lý AI" ở đầu tab Tạo mới hiểu lệnh tiếng Việt/Anh đơn giản bằng luật và từ khóa (không cần Internet, không cần khóa API), ví dụ: `Chọn điệp khúc 30 giây, bass mạnh, xuất mp3`, `Từ 0:45 đến 1:15, fade out 3 giây`, `Chuẩn hóa âm lượng và chống rè`, `Tìm nhạc piano nhẹ nhàng`.
+
+## Equalizer, DSP và Encoder (bước 4)
+
+- **FLAC** không mất dữ liệu (bộ mã hóa Java thuần, đã kiểm tra giải mã khớp từng mẫu bằng ffmpeg).
+- **MP3 với mọi tần số lấy mẫu**: file gốc 96 kHz, 88,2 kHz, 18 kHz... tự được đổi về tần số MP3 hỗ trợ (bộ đổi tần Lanczos).
+- **Đường cong EQ** trực quan, **preset tự lưu** (đặt tên, áp dụng, xóa).
+- **Nghe thử đoạn có hiệu ứng ngay** (EQ, preamp, giới hạn đỉnh, âm lượng).
+- OGG/Opus chưa có vì Android không có bộ mã hóa tích hợp và chưa có bản Java gọn, đã kiểm chứng.

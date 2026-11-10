@@ -123,7 +123,7 @@
     <string name="format_m4a">M4A (AAC)</string>
     <string name="format_mp3">MP3</string>
     <string name="format_wav">WAV (uncompressed)</string>
-    <string name="format_hint_mp3">MP3 supports 8-48 kHz sample rates. If the source uses another rate, choose M4A or WAV.</string>
+    <string name="format_hint_mp3">MP3 only supports certain sample rates (up to 48 kHz). If the source differs, the app converts it to the nearest supported rate.</string>
     <string name="format_hint_wav">WAV is uncompressed, so files are large (about 10 MB per minute); long ringtones get heavy.</string>
     <string name="msg_mp3_rate_unsupported">Cannot export MP3 because the source is %1$d Hz. Choose M4A or WAV.</string>
     <string name="msg_no_audio">Could not read any audio in the selected range.</string>
@@ -136,7 +136,7 @@
     <string name="label_preamp">Preamp: %1$s</string>
     <string name="label_normalize">Normalize volume</string>
     <string name="label_limiter">Peak limiter (anti-clipping)</string>
-    <string name="effects_hint">Effects are applied when you export. Tap “Preview result” to check them. Keep the limiter on when boosting bass or preamp.</string>
+    <string name="effects_hint">“Preview clip” applies the equalizer, preamp, peak limiter and volume live (not normalization or fades). Tap “Preview result” after exporting to hear the final file. Keep the limiter on when boosting bass or preamp.</string>
     <string name="msg_measuring">Measuring volume level…</string>
     <string name="label_fine_start">Fine-tune start point</string>
     <string name="label_fine_end">Fine-tune end point</string>
@@ -205,4 +205,11 @@
     <string name="agent_target">Use as: %1$s</string>
     <string name="agent_search">Searching “%1$s” in Discover</string>
     <string name="agent_export">Export started</string>
+
+    <string name="format_flac">FLAC (lossless)</string>
+    <string name="format_hint_flac">FLAC is lossless, so it is smaller than WAV but larger than MP3/M4A. Some older phones may not accept FLAC as a ringtone.</string>
+    <string name="custom_presets_title">Your presets</string>
+    <string name="preset_name_label">New preset name</string>
+    <string name="btn_save_preset">Save current EQ as a preset</string>
+    <string name="btn_delete_preset">Delete preset “%1$s”</string>
 </resources>

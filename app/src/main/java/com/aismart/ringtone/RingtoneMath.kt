@@ -50,10 +50,11 @@ object RingtoneMath {
 
     /** Dung lượng ước tính theo định dạng; WAV tính theo 44,1 kHz stereo 16-bit. */
     fun estimateOutputBytes(format: OutputFormat, bitrateKbps: Int, durationMs: Long): Long {
-        return if (format.usesBitrate) {
-            estimateSizeBytes(bitrateKbps, durationMs)
-        } else {
-            max(0L, durationMs) * 176_400L / 1000L + 44L
+        val wav = max(0L, durationMs) * 176_400L / 1000L + 44L
+        return when {
+            format == OutputFormat.FLAC -> wav * 6L / 10L
+            format.usesBitrate -> estimateSizeBytes(bitrateKbps, durationMs)
+            else -> wav
         }
     }
 
