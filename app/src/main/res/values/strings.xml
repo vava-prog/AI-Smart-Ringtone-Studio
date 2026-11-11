@@ -192,6 +192,7 @@
     <string name="agent_no_analysis">Chưa có dữ liệu phân tích nên chưa gợi ý được đoạn hay nhất.</string>
     <string name="agent_set_length">Đã đặt độ dài đoạn: %1$s</string>
     <string name="agent_set_range">Đã chọn đoạn %1$s – %2$s</string>
+    <string name="agent_more_suggestions">Có %1$d đoạn gợi ý, bấm chọn bên dưới</string>
     <string name="agent_smart_done">Đã chọn đoạn hay nhất %1$s – %2$s</string>
     <string name="agent_fade_in">Fade in: %1$s giây</string>
     <string name="agent_fade_out">Fade out: %1$s giây</string>

@@ -130,4 +130,4 @@ Nhạc tải từ tab Khám phá thuộc giấy phép của từng tác giả, h
 
 ## Quyền riêng tư / Privacy
 
-Ứng dụng **không thu thập dữ liệu người dùng**: không tài khoản, không phân tích/quảng cáo, không máy chủ của dự án, không gửi âm thanh hay danh sách nhạc của bạn đi đâu. Mọi xử lý (cắt, EQ, AI chọn đoạn, trợ lý lệnh) chạy trên máy. Chỉ khi bạn dùng tab Khám phá, từ khóa tìm kiếm được gửi trực tiếp tới dịch vụ bạn chọn (Openverse, Internet Archive, Jamendo, Deezer). Xem [PRIVACY.md](PRIVACY.md).
+Ứng dụng **không thu thập dữ liệu người dùng**: không tài khoản, không phân tích/quảng cáo, không máy chủ của dự án, không gửi âm thanh hay danh sách nhạc của bạn đi đâu. Mọi xử lý (cắt, EQ, AI chọn đoạn, trợ lý lệnh) chạy trên máy. Chỉ khi bạn dùng tab Khám phá, từ khóa tìm kiếm được gửi trực tiếp tới dịch vụ bạn chọn (Openverse, Internet Archive, Jamendo, Deezer). Xem [PRIVACY.md](PRIVACY.md); hướng dẫn khai báo Google Play ở [docs/GOOGLE-PLAY-DATA-SAFETY.md](docs/GOOGLE-PLAY-DATA-SAFETY.md).

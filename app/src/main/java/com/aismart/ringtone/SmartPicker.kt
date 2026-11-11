@@ -95,6 +95,9 @@ object BeatTracker {
 object SmartPicker {
     private const val FRAME_BUCKETS = 4
 
+    /** Số đoạn cao trào/điệp khúc tối đa được gợi ý (chưa tính đoạn mở đầu). */
+    private const val MAX_PEAKS = 3
+
     fun pick(a: TrackAnalysis, clipMs: Long, durationMs: Long): List<PickCandidate> {
         val n = a.rms.size
         val bucketMs = RingtoneMath.BUCKET_MS
@@ -175,7 +178,7 @@ object SmartPicker {
         val chosen = ArrayList<Int>()
         for (b in (0 until starts).sortedByDescending { score[it] }) {
             if (chosen.all { abs(it - b) >= minGap }) chosen.add(b)
-            if (chosen.size == 2) break
+            if (chosen.size == MAX_PEAKS) break
         }
 
         val result = ArrayList<PickCandidate>()

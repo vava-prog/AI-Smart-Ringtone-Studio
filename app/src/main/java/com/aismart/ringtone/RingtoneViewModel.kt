@@ -125,6 +125,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
     /** Kết quả của lần chạy lệnh trợ lý gần nhất. */
     var agentLog by mutableStateOf<List<Msg>>(emptyList())
+    var agentSuggestions by mutableStateOf<List<PickCandidate>>(emptyList())
         private set
 
     /** Tăng lên khi trợ lý muốn mở tab Khám phá. */
@@ -216,6 +217,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         profile = null
         analysisData = null
         pickCandidates = emptyList()
+        agentSuggestions = emptyList()
         bpm = null
         analyzing = false
         outputFile = null
@@ -375,6 +377,7 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     /** Trợ lý chạy trên máy: hiểu lệnh đơn giản và điều khiển các chức năng của ứng dụng. */
     fun runAgent(text: String) {
         val actions = AgentParser.parse(text)
+        agentSuggestions = emptyList()
         if (actions.isEmpty()) {
             agentLog = listOf(Msg(R.string.agent_unknown))
             return
@@ -402,6 +405,10 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
                 } else {
                     smartPick(action.kind)
                     log.add(Msg(R.string.agent_smart_done, RingtoneMath.formatTime(startMs), RingtoneMath.formatTime(endMs)))
+                    if (pickCandidates.size > 1) {
+                        agentSuggestions = pickCandidates
+                        log.add(Msg(R.string.agent_more_suggestions, pickCandidates.size))
+                    }
                 }
                 is AgentAction.FadeIn -> {
                     setFadeIn(action.seconds)

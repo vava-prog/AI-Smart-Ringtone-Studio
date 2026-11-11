@@ -192,6 +192,7 @@
     <string name="agent_no_analysis">No analysis data yet, so I cannot suggest the best part.</string>
     <string name="agent_set_length">Clip length set: %1$s</string>
     <string name="agent_set_range">Selected %1$s – %2$s</string>
+    <string name="agent_more_suggestions">%1$d suggested sections in total, tap one below to preview and pick</string>
     <string name="agent_smart_done">Picked the best part %1$s – %2$s</string>
     <string name="agent_fade_in">Fade in: %1$s s</string>
     <string name="agent_fade_out">Fade out: %1$s s</string>

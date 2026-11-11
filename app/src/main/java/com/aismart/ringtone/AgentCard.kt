@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -67,6 +68,24 @@ fun AgentCard(vm: RingtoneViewModel) {
                         },
                         label = { Text(example) }
                     )
+                }
+            }
+            if (vm.agentSuggestions.isNotEmpty()) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    vm.agentSuggestions.forEach { candidate ->
+                        FilterChip(
+                            selected = vm.startMs == candidate.startMs && vm.endMs == candidate.endMs,
+                            onClick = { vm.applyCandidate(candidate) },
+                            enabled = !vm.exporting,
+                            label = {
+                                Text(
+                                    stringResource(candidate.kind.labelRes) + " " +
+                                        RingtoneMath.formatTime(candidate.startMs) + "–" +
+                                        RingtoneMath.formatTime(candidate.endMs)
+                                )
+                            }
+                        )
+                    }
                 }
             }
             vm.agentLog.forEach { line ->
