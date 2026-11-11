@@ -91,6 +91,8 @@
     <string name="history_title">Ringtone history</string>
     <string name="history_meta_fmt">%1$s · %2$s · %3$s</string>
     <string name="btn_play">▶ Play</string>
+    <string name="btn_play_edit">▶ Play &amp; AI edit</string>
+    <string name="msg_history_missing">This ringtone file could not be found</string>
     <string name="btn_set_as">Set as…</string>
     <string name="btn_delete">Delete</string>
     <string name="dialog_set_title">Set as</string>

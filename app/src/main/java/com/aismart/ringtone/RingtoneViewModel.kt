@@ -665,6 +665,21 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
         play(MediaItem.fromUri(Uri.fromFile(history.file(entry))), null, entry.id)
     }
 
+    /** Mở nhạc chuông trong Lịch sử ở tab Tạo mới để nghe thử và chỉnh tiếp bằng trợ lý AI. */
+    fun openHistoryInCreate(entry: HistoryEntry) {
+        val file = history.file(entry)
+        if (!file.exists()) {
+            message = Msg(R.string.msg_history_missing)
+            return
+        }
+        stopPlayback()
+        loadSource(
+            Uri.fromFile(file),
+            entry.sourceUrl?.let { Credit(entry.title, it) }
+        )
+        openCreateTick++
+    }
+
     fun stopPlayback() {
         player?.stop()
         clearPlaying()

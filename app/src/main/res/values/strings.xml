@@ -91,6 +91,8 @@
     <string name="history_title">Lịch sử nhạc chuông</string>
     <string name="history_meta_fmt">%1$s · %2$s · %3$s</string>
     <string name="btn_play">▶ Nghe</string>
+    <string name="btn_play_edit">▶ Nghe &amp; chỉnh AI</string>
+    <string name="msg_history_missing">Không tìm thấy file nhạc chuông này</string>
     <string name="btn_set_as">Đặt làm…</string>
     <string name="btn_delete">Xóa</string>
     <string name="dialog_set_title">Đặt làm</string>

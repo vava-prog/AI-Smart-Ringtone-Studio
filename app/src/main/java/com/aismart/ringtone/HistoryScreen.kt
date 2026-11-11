@@ -90,9 +90,9 @@ fun HistoryScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                     )
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         TextButton(onClick = {
-                            if (isPlaying) vm.stopPlayback() else vm.playHistory(entry)
+                            if (isPlaying) vm.stopPlayback() else vm.openHistoryInCreate(entry)
                         }) {
-                            Text(stringResource(if (isPlaying) R.string.btn_stop else R.string.btn_play))
+                            Text(stringResource(if (isPlaying) R.string.btn_stop else R.string.btn_play_edit))
                         }
                         TextButton(onClick = { setAsEntry = entry }) {
                             Text(stringResource(R.string.btn_set_as))
