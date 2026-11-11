@@ -121,3 +121,9 @@ Tab **Khám phá** tìm nhạc có giấy phép mở (Openverse, Internet Archiv
 ## Tải APK
 
 Bản build mới nhất nằm ở mục **Releases → Debug APK (bản build mới nhất)** (tự cập nhật sau mỗi lần push vào `main`). Đây là bản debug để thử nghiệm; bản phát hành ký số dùng workflow `release-apk.yml`.
+
+## Giấy phép / License
+
+Mã nguồn gốc theo giấy phép **MIT** (xem [LICENSE](LICENSE)). Các thành phần của bên thứ ba giữ giấy phép riêng,
+đặc biệt bộ mã hóa MP3 (LAME, **LGPL**); chi tiết trong [LICENSE-NOTICES.md](LICENSE-NOTICES.md).
+Nhạc tải từ tab Khám phá thuộc giấy phép của từng tác giả, hãy ghi công theo yêu cầu.

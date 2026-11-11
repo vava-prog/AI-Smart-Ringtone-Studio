@@ -154,6 +154,11 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Text(
+                    stringResource(R.string.about_license),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
