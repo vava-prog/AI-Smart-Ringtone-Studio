@@ -124,6 +124,10 @@ Bản build mới nhất nằm ở mục **Releases → Debug APK (bản build m
 
 ## Giấy phép / License
 
-Mã nguồn gốc theo giấy phép **MIT** (xem [LICENSE](LICENSE)). Các thành phần của bên thứ ba giữ giấy phép riêng,
+Mã nguồn gốc theo giấy phép **Apache License 2.0** (xem [LICENSE](LICENSE)). Các thành phần của bên thứ ba giữ giấy phép riêng,
 đặc biệt bộ mã hóa MP3 (LAME, **LGPL**); chi tiết trong [LICENSE-NOTICES.md](LICENSE-NOTICES.md).
 Nhạc tải từ tab Khám phá thuộc giấy phép của từng tác giả, hãy ghi công theo yêu cầu.
+
+## Quyền riêng tư / Privacy
+
+Ứng dụng **không thu thập dữ liệu người dùng**: không tài khoản, không phân tích/quảng cáo, không máy chủ của dự án, không gửi âm thanh hay danh sách nhạc của bạn đi đâu. Mọi xử lý (cắt, EQ, AI chọn đoạn, trợ lý lệnh) chạy trên máy. Chỉ khi bạn dùng tab Khám phá, từ khóa tìm kiếm được gửi trực tiếp tới dịch vụ bạn chọn (Openverse, Internet Archive, Jamendo, Deezer). Xem [PRIVACY.md](PRIVACY.md).

@@ -106,7 +106,7 @@
     <string name="theme_dark">Dark</string>
     <string name="settings_about">About</string>
     <string name="about_version_fmt">Version %1$s</string>
-    <string name="about_license">Source code under the MIT License. MP3 encoding uses LAME (LGPL); AndroidX, Compose and Media3 are Apache 2.0. Music from Discover keeps each author\'s license, so credit them as required.</string>
+    <string name="about_license">Source code under the Apache License 2.0. This app does not collect user data. MP3 encoding uses LAME (LGPL); AndroidX, Compose and Media3 are Apache 2.0. Music from Discover keeps each author\'s license, so credit them as required.</string>
     <string name="about_text">All audio processing happens on your device and your files are never uploaded. Only the Discover tab uses the Internet, to find and download openly licensed music.</string>
 
     <string name="section_link">YouTube / TikTok link (optional)</string>

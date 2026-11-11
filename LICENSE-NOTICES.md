@@ -1,6 +1,6 @@
 # Giấy phép và thông báo của bên thứ ba / Third-party notices
 
-Mã nguồn gốc của dự án này theo giấy phép **MIT** (xem `LICENSE`). Các thành phần bên dưới giữ nguyên
+Mã nguồn gốc của dự án này theo giấy phép **Apache License 2.0** (xem `LICENSE`). Các thành phần bên dưới giữ nguyên
 giấy phép riêng của chúng.
 
 ## Thư viện đi kèm trong ứng dụng
@@ -19,7 +19,7 @@ và bạn có thể sửa đổi, build lại theo điều khoản LGPL. Nếu b
 giữ nguyên thông báo bản quyền và giấy phép LGPL, cung cấp mã nguồn của phần LAME (đã có trong repo)
 và cho phép người dùng thay bằng phiên bản LAME đã sửa đổi.
 
-### Mã tự viết trong dự án (theo giấy phép MIT)
+### Mã tự viết trong dự án (theo giấy phép Apache-2.0)
 
 Bộ mã hóa FLAC (`FlacEncoder.java`), bộ đổi tần số lấy mẫu (`Resampler.java`), bộ xử lý EQ/giới hạn đỉnh,
 bộ chọn đoạn thông minh và trợ lý lệnh được viết riêng cho dự án này. Không có mã FFmpeg hay FLAC/libFLAC

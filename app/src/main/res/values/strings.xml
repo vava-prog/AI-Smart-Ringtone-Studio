@@ -106,7 +106,7 @@
     <string name="theme_dark">Tối</string>
     <string name="settings_about">Giới thiệu</string>
     <string name="about_version_fmt">Phiên bản %1$s</string>
-    <string name="about_license">Mã nguồn theo giấy phép MIT. Bộ mã hóa MP3 dùng LAME (LGPL); các thư viện AndroidX, Compose, Media3 theo Apache 2.0. Nhạc từ mục Khám phá thuộc giấy phép của từng tác giả, hãy ghi công theo yêu cầu.</string>
+    <string name="about_license">Mã nguồn theo giấy phép Apache 2.0. Ứng dụng không thu thập dữ liệu người dùng. Bộ mã hóa MP3 dùng LAME (LGPL); các thư viện AndroidX, Compose, Media3 theo Apache 2.0. Nhạc từ mục Khám phá thuộc giấy phép của từng tác giả, hãy ghi công theo yêu cầu.</string>
     <string name="about_text">Mọi xử lý âm thanh diễn ra trên máy, ứng dụng không tải file của bạn lên Internet. Chỉ mục Khám phá mới dùng Internet để tìm và tải nhạc có giấy phép mở.</string>
 
     <string name="section_link">Link YouTube / TikTok (tùy chọn)</string>
