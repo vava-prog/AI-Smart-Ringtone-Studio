@@ -75,6 +75,15 @@ fun DashboardScreen(
         Text(stringResource(R.string.dash_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.dash_subtitle), style = MaterialTheme.typography.bodyMedium)
 
+        GlassCard(Modifier.fillMaxWidth()) {
+            DeskComputer(
+                onCreate = onCreate,
+                onDiscover = onOpenDiscover,
+                onHistory = onOpenHistory,
+                modifier = Modifier.padding(12.dp)
+            )
+        }
+
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatCard(
                 Modifier.weight(1f),

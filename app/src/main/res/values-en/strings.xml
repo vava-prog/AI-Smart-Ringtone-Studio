@@ -74,6 +74,8 @@
     <string name="nav_history">History</string>
     <string name="nav_settings">Settings</string>
 
+    <string name="desk_cd">Retro desk computer: tap the screen to create a ringtone, the keyboard to discover music, the tower for history</string>
+    <string name="desk_hint">Tap the screen, keyboard or tower</string>
     <string name="dash_title">Overview</string>
     <string name="dash_subtitle">Stats for the ringtones you have made</string>
     <string name="stat_count">Ringtones</string>

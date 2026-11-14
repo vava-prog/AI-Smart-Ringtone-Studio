@@ -74,6 +74,8 @@
     <string name="nav_history">Lịch sử</string>
     <string name="nav_settings">Cài đặt</string>
 
+    <string name="desk_cd">Máy tính để bàn cổ: chạm màn hình để tạo nhạc chuông, bàn phím để khám phá nhạc, thùng máy để mở lịch sử</string>
+    <string name="desk_hint">Chạm vào màn hình, bàn phím hoặc thùng máy</string>
     <string name="dash_title">Tổng quan</string>
     <string name="dash_subtitle">Thống kê các nhạc chuông bạn đã tạo</string>
     <string name="stat_count">Nhạc chuông</string>
