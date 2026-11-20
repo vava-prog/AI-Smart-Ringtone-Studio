@@ -74,6 +74,11 @@
     <string name="nav_history">Lịch sử</string>
     <string name="nav_settings">Cài đặt</string>
 
+    <string name="pricing_title">Gói sử dụng</string>
+    <string name="pricing_trial_fmt">Dùng thử miễn phí: còn %1$d ngày</string>
+    <string name="pricing_monthly_fmt">Gói tháng: %1$s/tháng</string>
+    <string name="pricing_lifetime">Gói vĩnh viễn: trả một lần</string>
+    <string name="pricing_not_connected">Thanh toán chưa được kết nối</string>
     <string name="desk_cd">Máy tính để bàn cổ: chạm màn hình để tạo nhạc chuông, bàn phím để khám phá nhạc, thùng máy để mở lịch sử</string>
     <string name="desk_hint">Chạm vào màn hình, bàn phím hoặc thùng máy</string>
     <string name="dash_title">Tổng quan</string>

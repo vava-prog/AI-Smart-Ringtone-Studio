@@ -126,6 +126,17 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     /** Kết quả của lần chạy lệnh trợ lý gần nhất. */
     var agentLog by mutableStateOf<List<Msg>>(emptyList())
     var agentSuggestions by mutableStateOf<List<PickCandidate>>(emptyList())
+
+    /** Trạng thái dùng thử/trả phí. Khi [PaywallConfig.ENABLED] tắt luôn là FREE_MODE. */
+    fun accessState(): AccessState {
+        if (PaywallConfig.ENABLED && settings.trialStartMs <= 0L) settings.trialStartMs = System.currentTimeMillis()
+        return Entitlement.state(
+            PaywallConfig.ENABLED, System.currentTimeMillis(),
+            settings.trialStartMs, settings.paidUntilMs, settings.lifetimeUnlocked
+        )
+    }
+
+    fun trialDaysLeft(): Int = Entitlement.trialDaysLeft(System.currentTimeMillis(), settings.trialStartMs)
         private set
 
     /** Tăng lên khi trợ lý muốn mở tab Khám phá. */

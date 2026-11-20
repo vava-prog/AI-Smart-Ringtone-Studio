@@ -144,6 +144,8 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
             }
         }
 
+        if (PaywallConfig.ENABLED) PricingCard(vm)
+
         GlassCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(R.string.settings_about), style = MaterialTheme.typography.titleMedium)
@@ -160,6 +162,27 @@ fun SettingsScreen(vm: RingtoneViewModel, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+        }
+    }
+}
+
+/** Chỉ hiện khi [PaywallConfig.ENABLED] bật. Nút mua chưa nối thanh toán nên đang tắt. */
+@Composable
+private fun PricingCard(vm: RingtoneViewModel) {
+    GlassCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.pricing_title), style = MaterialTheme.typography.titleMedium)
+            val state = vm.accessState()
+            if (state == AccessState.TRIAL) {
+                Text(stringResource(R.string.pricing_trial_fmt, vm.trialDaysLeft()))
+            }
+            Text(stringResource(R.string.pricing_monthly_fmt, Entitlement.formatVnd(PaywallConfig.MONTHLY_PRICE_VND)))
+            Text(stringResource(R.string.pricing_lifetime))
+            Text(
+                stringResource(R.string.pricing_not_connected),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

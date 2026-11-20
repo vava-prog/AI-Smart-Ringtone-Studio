@@ -125,6 +125,18 @@ class SettingsStore(context: Context) {
         set(value) = prefs.edit().putString("custom_presets", value).apply()
 
     /** client_id Jamendo do người dùng tự đăng ký (tùy chọn). */
+    var trialStartMs: Long
+        get() = prefs.getLong("trial_start", 0L)
+        set(value) = prefs.edit().putLong("trial_start", value).apply()
+
+    var paidUntilMs: Long
+        get() = prefs.getLong("paid_until", 0L)
+        set(value) = prefs.edit().putLong("paid_until", value).apply()
+
+    var lifetimeUnlocked: Boolean
+        get() = prefs.getBoolean("lifetime", false)
+        set(value) = prefs.edit().putBoolean("lifetime", value).apply()
+
     var jamendoClientId: String
         get() = prefs.getString("jamendo_client_id", "") ?: ""
         set(value) = prefs.edit().putString("jamendo_client_id", value.trim()).apply()

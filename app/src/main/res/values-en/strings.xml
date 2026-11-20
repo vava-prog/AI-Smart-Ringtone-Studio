@@ -74,6 +74,11 @@
     <string name="nav_history">History</string>
     <string name="nav_settings">Settings</string>
 
+    <string name="pricing_title">Plans</string>
+    <string name="pricing_trial_fmt">Free trial: %1$d days left</string>
+    <string name="pricing_monthly_fmt">Monthly plan: %1$s/month</string>
+    <string name="pricing_lifetime">Lifetime plan: one-time payment</string>
+    <string name="pricing_not_connected">Payments are not connected yet</string>
     <string name="desk_cd">Retro desk computer: tap the screen to create a ringtone, the keyboard to discover music, the tower for history</string>
     <string name="desk_hint">Tap the screen, keyboard or tower</string>
     <string name="dash_title">Overview</string>
