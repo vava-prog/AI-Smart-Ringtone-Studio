@@ -35,7 +35,8 @@ class EntitlementTest {
     @Test
     fun daysLeftRoundsUp() {
         assertEquals(7, Entitlement.trialDaysLeft(0, 0, 7))
-        assertEquals(6, Entitlement.trialDaysLeft(2 * day - 1, day, 7))
+        assertEquals(7, Entitlement.trialDaysLeft(2 * day - 1, day, 7))
+        assertEquals(6, Entitlement.trialDaysLeft(2 * day, day, 7))
         assertEquals(3, Entitlement.trialDaysLeft(5 * day, day, 7))
         assertEquals(0, Entitlement.trialDaysLeft(9 * day, day, 7))
     }
