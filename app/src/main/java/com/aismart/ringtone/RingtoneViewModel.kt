@@ -125,7 +125,9 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
 
     /** Kết quả của lần chạy lệnh trợ lý gần nhất. */
     var agentLog by mutableStateOf<List<Msg>>(emptyList())
+        private set
     var agentSuggestions by mutableStateOf<List<PickCandidate>>(emptyList())
+        private set
 
     /** Trạng thái dùng thử/trả phí. Khi [PaywallConfig.ENABLED] tắt luôn là FREE_MODE. */
     fun accessState(): AccessState {
@@ -137,7 +139,6 @@ class RingtoneViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun trialDaysLeft(): Int = Entitlement.trialDaysLeft(System.currentTimeMillis(), settings.trialStartMs)
-        private set
 
     /** Tăng lên khi trợ lý muốn mở tab Khám phá. */
     var openDiscoverTick by mutableIntStateOf(0)
